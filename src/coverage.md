@@ -39,9 +39,11 @@
 
 ## Order of the contract documents
 
-1. **`irig106-time`** — drafted, all eight sections, for the owner's review
-   (2026-09-27): `irig106-time` `docs/TIME-IN-CHAPTER-10.md`, with the crate
-   checked against the standard in `docs/STANDARD-REVIEW.md`.
+1. **`irig106-time`** — drafted, all eight sections (2026-09-27):
+   `irig106-time` `docs/TIME-IN-CHAPTER-10.md`, with the crate checked
+   against the standard in `docs/STANDARD-REVIEW.md`. The owner decided to
+   rebuild the crate (2026-09-27); its ADRs, revised architecture, and L1
+   are drafted for review.
 2. **`irig106-decode`** — Chapters 4, 7, 8, 12 (and 5, last), and Chapter
    11's data-type bodies; the largest consumer of the TMATS description.
 3. **`irig106-core`** — Chapter 10 recording files and Chapter 11's packet
@@ -78,6 +80,16 @@ door open:
   §23.2.1.6).
   `irig106-tmats` has deferred XML TMATS (its ADR-0015); when that support
   is designed, it should be built so that an MDL crate could reuse it.
+
+## Conventions across the ecosystem
+
+- **Edition 2024 and Rust 1.85** for every crate (owner, 2026-09-27;
+  `irig106-time` ADR-0003). `irig106-tmats`, `irig106-time`, and
+  `irig106-types` declare it; the other crates, already on edition 2024,
+  add `rust-version = "1.85"` at their next change.
+- **Related RCC documents** are archived with the standard: the handbooks
+  (RCC 118, 119, 123, 124) and RCC 200-16, "IRIG Serial Time Code
+  Formats", which Chapter 11 cites for IRIG time (release `rcc-200-16`).
 
 ## Open points
 
