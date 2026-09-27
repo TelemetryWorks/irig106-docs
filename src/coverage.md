@@ -39,8 +39,9 @@
 
 ## Order of the contract documents
 
-1. **`irig106-time`** — next (owner, 2026-09-26): Chapter 11's time packets
-   and the time attributes TMATS supplies; expected to be the simplest.
+1. **`irig106-time`** — drafted, all eight sections, for the owner's review
+   (2026-09-27): `irig106-time` `docs/TIME-IN-CHAPTER-10.md`, with the crate
+   checked against the standard in `docs/STANDARD-REVIEW.md`.
 2. **`irig106-decode`** — Chapters 4, 7, 8, 12 (and 5, last), and Chapter
    11's data-type bodies; the largest consumer of the TMATS description.
 3. **`irig106-core`** — Chapter 10 recording files and Chapter 11's packet
