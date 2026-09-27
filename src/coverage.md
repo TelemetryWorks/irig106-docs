@@ -84,9 +84,14 @@ door open:
 ## Conventions across the ecosystem
 
 - **Edition 2024 and Rust 1.85** for every crate (owner, 2026-09-27;
-  `irig106-time` ADR-0003). `irig106-tmats`, `irig106-time`, and
-  `irig106-types` declare it; the other crates, already on edition 2024,
-  add `rust-version = "1.85"` at their next change.
+  `irig106-time` ADR-0003). Declared by `irig106-tmats`, `irig106-time`
+  (and `irig106-time-cli`), `irig106-types`, `irig106-core`,
+  `irig106-decode`, `irig106-write`, `irig106-index`, `irig106-cli`, and
+  `irig106-ch10-reader`, each checked with `cargo +1.85`. **Exception:**
+  `irig106-studio` (edition 2021) cannot build on 1.85 — its locked
+  dependencies `darling` 0.23, `serde_with` 3.18, and `time` 0.3.47 require
+  Rust 1.88 — so it is left unchanged until its refactor decides between
+  older dependencies and a higher floor for the application.
 - **Related RCC documents** are archived with the standard: the handbooks
   (RCC 118, 119, 123, 124) and RCC 200-16, "IRIG Serial Time Code
   Formats", which Chapter 11 cites for IRIG time (release `rcc-200-16`).
