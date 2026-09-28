@@ -96,6 +96,21 @@ door open:
   (RCC 118, 119, 123, 124) and RCC 200-16, "IRIG Serial Time Code
   Formats", which Chapter 11 cites for IRIG time (release `rcc-200-16`).
 
+## Ideas for later
+
+From the draft ecosystem requirements of the retired `irig106-rust`
+repository (2026-01-21; kept in `irig106-tmats`
+`docs/research/2026-09-26-irig106-rust/`), not yet owned by any crate:
+
+- **A C interface** (REQ-L1-114): an optional foreign-function interface so
+  existing C and C++ telemetry applications can call the libraries.
+- **Chapter 10 UDP streaming** and **advanced PCM decommutation** (its
+  "future considerations").
+
+Its other requirements now sit in the crates' L1: Windows, Linux, and macOS;
+80% test coverage; the 100 Mbps throughput figure; safe Rust with no panics;
+and the dependency policy (`irig106-tmats` and `irig106-time`, 2026-09-27).
+
 ## Open points
 
 - The draft `src/architecture/overview.md` names a crate `irig106-1553`
