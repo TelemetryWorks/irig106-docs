@@ -1,0 +1,14 @@
+[book]
+title = "The TelemetryWorks IRIG 106 Ecosystem"
+authors = ["TelemetryWorks"]
+language = "en"
+src = "src"
+
+[build]
+build-dir = "book"
+
+[output.html]
+git-repository-url = "https://github.com/TelemetryWorks/irig106-docs"
+
+[output.html.search]
+enable = true
