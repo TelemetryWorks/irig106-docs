@@ -18,13 +18,16 @@ With `mdbook` on PATH, run from this repository:
 ```sh
 RAYON_NUM_THREADS=2 mdbook build
 python3 scripts/check-book.py
+python3 scripts/test-check-book.py
 git diff --check
 ```
 
 The checker requires the populated `book/` output. It verifies SUMMARY membership,
 nonempty chapters, rendered local links and anchors, README local links, and that
 every chapter is in the search index, including the current coverage-map text.
-It does not fetch external links or test sibling repositories. There are no Rust
+The regression runs the actual checker with an ASCII default for implicit text
+reads, while explicit UTF-8 remains strict. It does not fetch external links or
+test sibling repositories. There are no Rust
 API examples in this book to compile as doctests.
 
 For a local preview, `RAYON_NUM_THREADS=2 mdbook serve --hostname 127.0.0.1` serves

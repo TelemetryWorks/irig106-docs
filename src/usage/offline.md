@@ -3,10 +3,10 @@
 ## Available source-backed workflow
 
 `irig106-ch10-reader` contains a structural inspection CLI named `ch10r`. Its
-[pinned README](https://github.com/TelemetryWorks/irig106-ch10-reader/blob/73a0afb47efc81cde116c7f08d77887eabd23847/README.md)
+[pinned README](https://github.com/TelemetryWorks/irig106-ch10-reader/blob/f1a747401c6ef005d52e863a0de281c036bb872e/README.md)
 supports **Windows only** as an executable target for version 0.1.2; Linux and
 macOS guides are future-support placeholders. Its
-[CLI source](https://github.com/TelemetryWorks/irig106-ch10-reader/blob/73a0afb47efc81cde116c7f08d77887eabd23847/src/lib.rs)
+[CLI source](https://github.com/TelemetryWorks/irig106-ch10-reader/blob/f1a747401c6ef005d52e863a0de281c036bb872e/src/lib.rs)
 implements the following invocation shapes. These commands are for an existing
 reader checkout with its prerequisites installed, **not this documentation
 repository**, and were not executed during the book's source review:

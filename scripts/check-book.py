@@ -53,7 +53,7 @@ def local_target(origin, link, boundary):
 
 def check(root, output):
     source = root / "src"
-    summary = (source / "SUMMARY.md").read_text()
+    summary = (source / "SUMMARY.md").read_text(encoding="utf-8")
     # SUMMARY contains plain inline chapter links; reject missing/duplicate chapters.
     members = re.findall(r"\[[^\]]+\]\(([^)]+)\)", summary)
     chapters = {p.relative_to(source).as_posix() for p in source.rglob("*.md")}
@@ -61,13 +61,13 @@ def check(root, output):
     require(set(members) == chapters, f"SUMMARY mismatch: {set(members) ^ chapters}")
     require(all(n == 1 for n in Counter(members).values()), "Duplicate SUMMARY chapter")
     for member in members:
-        text = (source / member).read_text().strip()
+        text = (source / member).read_text(encoding="utf-8").strip()
         require(len(text.splitlines()) > 1, f"Empty chapter: {member}")
         require(text.startswith("# "), f"Missing chapter heading: {member}")
         require((output / Path(member).with_suffix(".html")).is_file(),
                 f"Chapter not rendered: {member}")
 
-    pages = {p.resolve(): Page(p.read_text()) for p in output.rglob("*.html")}
+    pages = {p.resolve(): Page(p.read_text(encoding="utf-8")) for p in output.rglob("*.html")}
     require(pages, "No HTML output; run mdbook build first")
     count = 0
     for origin, page in pages.items():
@@ -82,7 +82,7 @@ def check(root, output):
             count += 1
 
     readme = root / "README.md"
-    for link in re.findall(r"\[[^\]]+\]\(([^)]+)\)", readme.read_text()):
+    for link in re.findall(r"\[[^\]]+\]\(([^)]+)\)", readme.read_text(encoding="utf-8")):
         result = local_target(readme, link, root)
         if result:
             # README currently links files, without Markdown heading fragments.
@@ -90,7 +90,7 @@ def check(root, output):
 
     indexes = list(output.glob("searchindex-*.js"))
     require(len(indexes) == 1, "Expected one mdBook 0.5.4 search index; clean/rebuild output")
-    script = indexes[0].read_text()
+    script = indexes[0].read_text(encoding="utf-8")
     # mdBook 0.5.4 wraps its JSON in JSON.parse('...'). literal_eval decodes the
     # quoted string only; it does not execute JavaScript or Python expressions.
     literal = script.split("JSON.parse(", 1)[1].rsplit(")", 2)[0]

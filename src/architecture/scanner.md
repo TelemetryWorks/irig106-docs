@@ -1,7 +1,7 @@
 # Packet scanning
 
 **Current evidence:** `irig106-core` contains only the template library. The
-[reader source](https://github.com/TelemetryWorks/irig106-ch10-reader/blob/73a0afb47efc81cde116c7f08d77887eabd23847/src/lib.rs)
+[reader source](https://github.com/TelemetryWorks/irig106-ch10-reader/blob/f1a747401c6ef005d52e863a0de281c036bb872e/src/lib.rs)
 contains structural traversal, primary-header checksum computation, bounds
 checks, and a bounded scalar recovery search. That code is not evidence of a
 SIMD scanner in core, and it has not been executed for this book's snapshot.
