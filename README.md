@@ -1,2 +1,2 @@
 # irig106-docs
-The official documentation, tutorials, and integration guides for the IRIG 106 ecosystem.
+Your comprehensive guide to building with the IRIG 106 ecosystem. This repository centralizes developer onboarding, featuring in-depth tutorials, cross-crate integration examples, and conceptual overviews to help you engineer safe, high-performance telemetry applications.  
