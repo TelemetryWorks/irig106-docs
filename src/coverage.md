@@ -7,6 +7,22 @@
 > archived standard, with original URLs and checksums, is in
 > `TelemetryWorks/rcc-106-standards`.
 
+## Reading this historical map today
+
+The ownership and priority decisions below were recorded on **2026-09-26 and
+2026-09-27** and remain the adopted map. “Current edition” in the opening notice
+refers to that recorded baseline. Ownership means responsibility, not implemented
+chapter support. Contract drafts describe intended behavior, not shipped APIs.
+
+The Rust-version declarations and `cargo +1.85` checks below are **historical
+local evidence inherited with this branch**, not checks executed by this cloud
+maintainer or proof of the current pushed state. Local uncommitted work is not
+available in this checkout. The separate
+[2026-11-10 implementation snapshot](implementation.md) records the GitHub source
+actually inspected, including the template shared-types crate, absent
+`rust-version` declarations in several manifests, and unresolved dependencies.
+No sibling build, benchmark, release, or real-recording test was run for this book.
+
 ## How the standard is covered
 
 - **One contract document per repository**, for the chapters it owns,
@@ -81,7 +97,7 @@ door open:
   `irig106-tmats` has deferred XML TMATS (its ADR-0015); when that support
   is designed, it should be built so that an MDL crate could reuse it.
 
-## Conventions across the ecosystem
+## Conventions recorded on 2026-09-27
 
 - **Edition 2024 and Rust 1.85** for every crate (owner, 2026-09-27;
   `irig106-time` ADR-0003). Declared by `irig106-tmats`, `irig106-time`
@@ -96,7 +112,7 @@ door open:
   (RCC 118, 119, 123, 124) and RCC 200-16, "IRIG Serial Time Code
   Formats", which Chapter 11 cites for IRIG time (release `rcc-200-16`).
 
-## Ideas for later
+## Ideas for later (recorded 2026-09-27)
 
 From the draft ecosystem requirements of the retired `irig106-rust`
 repository (2026-01-21; kept in `irig106-tmats`
@@ -111,8 +127,13 @@ Its other requirements now sit in the crates' L1: Windows, Linux, and macOS;
 80% test coverage; the 100 Mbps throughput figure; safe Rust with no panics;
 and the dependency policy (`irig106-tmats` and `irig106-time`, 2026-09-27).
 
-## Open points
+## Historical open point and documentation resolution
 
 - The draft `src/architecture/overview.md` names a crate `irig106-1553`
   for 1553 decoding; this map assigns bus data to `irig106-decode`. One of
   the two should change.
+
+**Resolved in this book, 2026-11-10:** the architecture now assigns MIL-STD-1553
+payload decoding to `irig106-decode`, consistent with this ownership map. The old
+name above is retained as the historical discrepancy, not a dependency to install.
+The decode repository is still a scaffold in the verified snapshot.

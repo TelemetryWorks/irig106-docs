@@ -1,11 +1,25 @@
-# The Evolution of IRIG 106 Parsing: From C to Rust
+# History and direction
 
-For years, the telemetry community has relied on foundational C libraries, most notably the open-source `irig106lib`, to parse and process IRIG 106 Chapter 10 data. This library has served as the critical backbone for countless flight test programs and data analysis tools. It provided a highly portable, universally understood reference implementation for a complex standard.  
-The architecture of `irig106lib` and similar legacy parsers is a product of its time and the paradigms of the C programming language. It follows a classic, stateful, function-dispatch model:  
-1. Open a file handle.
-2. Read the next header into memory.
-3. Read the payload into a buffer.
-4. Execute a massive `switch` statement on the data type.
-5. Invoke the matching decoder function to fully unpack the payload into C structs.
-While excellent for establishing a baseline of compatibility, this "monolithic parser" approach presents bottlenecks for modern, high-throughput workflows. It fundamentally tightly couples data traversal with data interpretation. In modern telemetry environments—where we are handling massive data lakes, streaming UDP ingest, and require rapid filtering—we rarely need to deeply decode every single payload. Often, a user simply wants to extract all MIL-STD-1553 messages from a specific channel within a tight time window. The legacy model forces the CPU to do unnecessary allocation and decoding work just to traverse the stream.  
-This Rust implementation is not a 1:1 port of the C library. Instead, it is a ground-up reimagining of how to interact with Chapter 10 data, leveraging modern hardware capabilities and Rust's unique memory safety guarantees.  
+TelemetryWorks is organizing IRIG 106 work around separate responsibilities:
+packet structure, setup metadata, time interpretation, payload decoding, and
+applications. The [coverage map](coverage.md) records the owner's September 2026
+allocation of chapters and rebuild decisions. The
+[implementation snapshot](implementation.md) records the narrower pushed state.
+
+The earlier book draft described this direction as a finished replacement for
+C parsers. That claim was not supported by implementation or comparative
+measurements. Language choice alone does not determine copying, allocation,
+traversal cost, or throughput: C can expose borrowed buffers, and Rust programs
+can allocate and copy. A comparison would need pinned implementations, equivalent
+validation and decoding work, representative recordings, hardware details, and
+reproducible measurements.
+
+The intended benefit of separating traversal from interpretation is that an
+application can reject unneeded packets before decoding their payloads. Whether
+that saves meaningful time depends on the workload. No ecosystem-wide speedup,
+SIMD implementation, or end-to-end zero-copy guarantee is established here.
+
+The historical requirements retained in the coverage map, including throughput
+and test-coverage targets, remain requirements rather than measured results.
+The retired prototype research informs future work; it is not evidence that its
+features have shipped in the current repositories.
