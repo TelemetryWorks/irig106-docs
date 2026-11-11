@@ -34,6 +34,16 @@ For a local preview, `RAYON_NUM_THREADS=2 mdbook serve --hostname 127.0.0.1` ser
 the book at `http://127.0.0.1:3000`; stop it when finished. Building and previewing
 do not publish or deploy. Generated `book/` output is ignored by Git.
 
+## Continuous integration
+
+[Book CI](.github/workflows/book.yml) runs the same build, book checker, and
+verbose encoding regression on Linux and Windows for pull requests and pushes to
+`main`. It uses Python 3.11, mdBook 0.5.4 release assets with reviewed SHA-256
+pins, read-only repository permissions, two concurrent matrix jobs at most,
+ten-minute job timeouts, and two Rayon workers. Job logs identify the checked-out
+commit, platform, Python and mdBook versions, verified archive digest, and both
+encoding regression tests. No book content or check assertions are changed by CI.
+
 ## Contributing
 
 Keep historical decisions dated. For implementation claims, link the inspected

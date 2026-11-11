@@ -1,0 +1,109 @@
+name: Book CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: book-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  book:
+    name: Book (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            asset: mdbook-v0.5.4-x86_64-unknown-linux-gnu.tar.gz
+            sha256: 3f28de05dafca9d0f2eab99c662116b0e37b89b1d96a08f8f430b9eeae958cd7
+          - os: windows-2022
+            asset: mdbook-v0.5.4-x86_64-pc-windows-msvc.zip
+            sha256: 8a6b2421aa522de06d746871d2b8fff9c8d71773467e310a4516d2566e7f2de4
+    env:
+      RAYON_NUM_THREADS: '2'
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.11'
+
+      - name: Install verified mdBook 0.5.4
+        shell: python
+        env:
+          MDBOOK_ASSET: ${{ matrix.asset }}
+          MDBOOK_SHA256: ${{ matrix.sha256 }}
+        run: |
+          import hashlib
+          import io
+          import os
+          from pathlib import Path
+          import tarfile
+          import urllib.request
+          import zipfile
+
+          # Digests verified on 2026-11-11 against rust-lang/mdBook's release API:
+          # https://api.github.com/repos/rust-lang/mdBook/releases/tags/v0.5.4
+          # Asset IDs: Linux 468209394; Windows 468210971. Never resolve "latest".
+          asset = os.environ["MDBOOK_ASSET"]
+          url = f"https://github.com/rust-lang/mdBook/releases/download/v0.5.4/{asset}"
+          with urllib.request.urlopen(url, timeout=60) as response:
+              data = response.read(32 * 1024 * 1024 + 1)
+          if len(data) > 32 * 1024 * 1024:
+              raise SystemExit("mdBook archive exceeds 32 MiB limit")
+          digest = hashlib.sha256(data).hexdigest()
+          if digest != os.environ["MDBOOK_SHA256"]:
+              raise SystemExit(f"mdBook SHA-256 mismatch: {digest}")
+          print(f"Verified {asset}: sha256:{digest}", flush=True)
+
+          # Read only the executable member, after verification; no general extraction.
+          if asset.endswith(".zip"):
+              executable = "mdbook.exe"
+              with zipfile.ZipFile(io.BytesIO(data)) as archive:
+                  binary = archive.read(executable)
+          else:
+              executable = "mdbook"
+              with tarfile.open(fileobj=io.BytesIO(data), mode="r:gz") as archive:
+                  binary = archive.extractfile(executable).read()
+          destination = Path(os.environ["RUNNER_TEMP"]) / "mdbook-0.5.4"
+          destination.mkdir()
+          tool = destination / executable
+          tool.write_bytes(binary)
+          if os.name != "nt":
+              tool.chmod(0o755)
+          with open(os.environ["GITHUB_PATH"], "a", encoding="utf-8") as path_file:
+              path_file.write(str(destination) + "\n")
+
+      - name: Build and check the actual book
+        shell: python
+        run: |
+          import os
+          import platform
+          import subprocess
+          import sys
+
+          print(f"Platform: {platform.platform()}; Python: {sys.version}", flush=True)
+          print(f"Event SHA: {os.environ['GITHUB_SHA']}", flush=True)
+          subprocess.run(["git", "rev-parse", "HEAD"], check=True)
+          version = subprocess.check_output(["mdbook", "--version"], text=True).strip()
+          print(version, flush=True)
+          if version != "mdbook v0.5.4":
+              raise SystemExit("Unexpected mdBook version")
+          subprocess.run(["mdbook", "build"], check=True)
+          subprocess.run([sys.executable, "scripts/check-book.py"], check=True)
+          # Verbose names show both the implicit-read failure proof and full-book pass.
+          subprocess.run([sys.executable, "scripts/test-check-book.py", "-v"], check=True)
+          subprocess.run(["git", "diff", "--check"], check=True)
