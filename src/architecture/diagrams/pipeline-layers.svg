@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="1080" viewBox="0 0 1160 1080" role="img" aria-labelledby="title desc">
+<title id="title">1 · Crate layers and dependency direction</title><desc id="desc">Arrows point from consumers toward providers. Planned dependencies and information-consumption paths are dashed. Two unresolved TMATS packet-facts seam options are shown side by side.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#365670"/></marker></defs>
+<rect width="1160" height="1080" fill="#fff"/>
+<text x="35" y="38" font-family="DejaVu Sans, sans-serif" font-size="24" fill="#132e42" font-weight="bold">
+<tspan x="35" dy="0">1 · Crate layers and dependency direction</tspan>
+</text>
+<text x="35" y="68" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="35" dy="0">Arrows point to the provider used. Solid: existing boundary. Dashed: planned use / integration.</tspan>
+</text>
+<rect x="410" y="100" width="340" height="66" rx="10" fill="#eaf4f8" stroke="#3d718c" stroke-width="1.7"/>
+<text x="426" y="127" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
+<tspan x="426" dy="0">irig106-types</tspan>
+<tspan x="426" dy="23.2">Shared values; no packet reader</tspan>
+</text>
+<rect x="410" y="212" width="340" height="80" rx="10" fill="#eaf4f8" stroke="#3d718c" stroke-width="1.7"/>
+<text x="426" y="239" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="426" dy="0">irig106-core · released 0.1.0</tspan>
+<tspan x="426" dy="21.75">ONE PacketReader; structure only</tspan>
+<tspan x="426" dy="21.75">FILE ORDER + byte offsets</tspan>
+</text>
+<path d="M580 212 V166" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="95" y="350" width="400" height="90" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="111" y="377" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
+<tspan x="111" dy="0">irig106-tmats · rebuild planned</tspan>
+<tspan x="111" dy="23.2">Setup assembly + TimeView planned</tspan>
+<tspan x="111" dy="23.2">No time interpretation</tspan>
+</text>
+<rect x="665" y="350" width="400" height="90" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="681" y="377" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
+<tspan x="681" dy="0">irig106-time</tspan>
+<tspan x="681" dy="23.2">Leaf: depends only on types</tspan>
+<tspan x="681" dy="23.2">Bounded TimeView seam planned</tspan>
+</text>
+<path d="M295 350 V186 H450 V166" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<path d="M865 350 V186 H710 V166" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="410" y="496" width="340" height="65" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="426" y="523" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
+<tspan x="426" dy="0">irig106-decode · planned</tspan>
+<tspan x="426" dy="23.2">Payloads + qualified context</tspan>
+</text>
+<path d="M480 496 V465 H295 V440" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<path d="M680 496 V465 H865 V440" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<rect x="95" y="618" width="970" height="65" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="111" y="645" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
+<tspan x="111" dy="0">irig106-write / irig106-index / irig106-validator · planned</tspan>
+<tspan x="111" dy="23.2">Downstream consumers; exact dependency manifests are not fixed by this diagram</tspan>
+</text>
+<path d="M580 618 V561" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<rect x="95" y="745" width="470" height="82" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="111" y="772" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
+<tspan x="111" dy="0">irig106-cli · planned</tspan>
+<tspan x="111" dy="23.2">Umbrella mounts time + tmats CLIs</tspan>
+<tspan x="111" dy="23.2">Orchestrator may live here</tspan>
+</text>
+<rect x="655" y="745" width="410" height="82" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="671" y="772" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
+<tspan x="671" dy="0">irig106-studio</tspan>
+<tspan x="671" dy="23.2">Existing app; pipeline integration planned</tspan>
+</text>
+<path d="M330 745 V683" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<path d="M860 745 V683" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="35" y="870" font-family="DejaVu Sans, sans-serif" font-size="17" fill="#183447" font-weight="bold">
+<tspan x="35" dy="0">OPEN OWNER POINT · TMATS packet-facts input location (both options planned)</tspan>
+</text>
+<rect x="35" y="890" width="530" height="95" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="51" y="917" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="51" dy="0">A · Plain packet facts in irig106-types (planned)</tspan>
+<tspan x="51" dy="21.75">tmats → types; stays independent of core</tspan>
+<tspan x="51" dy="21.75">Orchestrator converts core packets to plain facts</tspan>
+</text>
+<rect x="595" y="890" width="530" height="95" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="611" y="917" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="611" dy="0">B · TMATS directly depends on core (planned)</tspan>
+<tspan x="611" dy="21.75">tmats → core for the packet-facts input</tspan>
+<tspan x="611" dy="21.75">Time still depends only on types in either option</tspan>
+</text>
+<text x="35" y="1020" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="35" dy="0">Layer placement is conceptual, not a chain of library calls. Orchestrator calls are in diagram 2.</tspan>
+<tspan x="35" dy="21.75">irig106-ch10-reader is archived; it is not a second reader in the recommended pipeline.</tspan>
+</text>
+</svg>

@@ -21,6 +21,10 @@ points inspected; the [coverage map](../coverage.md) records ownership decisions
 MIL-STD-1553 decoding belongs to `irig106-decode` in the adopted map. There is no
 separate `irig106-1553` crate established by the inspected ecosystem sources.
 
+For the owner-directed **2026-11-23** design, including core 0.1.0 and the archived
+reader, see [how the libraries pass information](pipeline.md). The earlier
+snapshot statements on this page retain their 2026-11-10 scope.
+
 ## Dependency boundaries still to reconcile
 
 - `irig106-time` asks for `irig106-types` version `0.1` at a sibling path and

@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="1040" viewBox="0 0 1160 1040" role="img" aria-labelledby="title desc">
+<title id="title">4 · Ordering and setup phases</title><desc id="desc">Planned state machine with caller-asserted start provenance. Only static Format 1 setup packets may precede the first time packet; ordering violations withhold adoption with a finding. Time markers seal initial and later per-channel candidates before completeness assessment.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#365670"/></marker></defs>
+<rect width="1160" height="1040" fill="#fff"/>
+<text x="35" y="38" font-family="DejaVu Sans, sans-serif" font-size="24" fill="#132e42" font-weight="bold">
+<tspan x="35" dy="0">4 · Ordering and setup phases</tspan>
+</text>
+<text x="35" y="68" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
+<tspan x="35" dy="0">Owner direction 2026-11-23 · state machine and integration planned</tspan>
+</text>
+<rect x="35" y="135" width="320" height="130" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="51" y="162" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="51" dy="0">START EVIDENCE · planned</tspan>
+<tspan x="51" dy="21.75">Caller asserts known session start.</tspan>
+<tspan x="51" dy="21.75">Unknown / cropped start remains</tspan>
+<tspan x="51" dy="21.75">unknown: automatic adoption withheld.</tspan>
+</text>
+<rect x="465" y="135" width="560" height="105" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="481" y="162" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="481" dy="0">INITIAL SETUP PHASE · planned</tspan>
+<tspan x="481" dy="21.75">Only static Format 1 setup packets may precede first time.</tspan>
+<tspan x="481" dy="21.75">Join independently per channel; retain provenance.</tspan>
+</text>
+<path d="M355 185 H465" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<path d="M1025 165 H1100 V290 H920 V240" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="710" y="281" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="710" dy="0">static Format 1 setup → join that channel</tspan>
+</text>
+<rect x="35" y="395" width="320" height="140" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="51" y="422" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="51" dy="0">ORDERING VIOLATION · planned</tspan>
+<tspan x="51" dy="21.75">Any other packet before first time.</tspan>
+<tspan x="51" dy="21.75">Adoption withheld + finding.</tspan>
+<tspan x="51" dy="21.75">Keep bytes and ordering evidence.</tspan>
+<tspan x="51" dy="21.75">Later time does not erase violation.</tspan>
+</text>
+<path d="M465 215 H400 V440 H355" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="40" y="353" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="40" dy="0">anything except allowed setup / eligible TIME</tspan>
+</text>
+<rect x="465" y="395" width="560" height="105" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="481" y="422" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="481" dy="0">FIRST TRUSTED TIME · planned</tspan>
+<tspan x="481" dy="21.75">ANY channel: seal initial per-channel candidates.</tspan>
+<tspan x="481" dy="21.75">INT-034 completeness → eligible parse, then dispatch time.</tspan>
+</text>
+<path d="M745 240 V395" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="560" y="329" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="560" dy="0">eligible TIME header type only</tspan>
+</text>
+<path d="M355 495 H465" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="373" y="480" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="373" dy="0">time</tspan>
+</text>
+<rect x="465" y="600" width="560" height="100" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="481" y="627" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="481" dy="0">DATA PHASE · planned</tspan>
+<tspan x="481" dy="21.75">Route packets with qualified declarations + time answers.</tspan>
+<tspan x="481" dy="21.75">Missing / withheld context stays explicit.</tspan>
+</text>
+<path d="M745 500 V600" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="570" y="557" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="570" dy="0">never equate sealed with complete or adopted</tspan>
+</text>
+<rect x="465" y="815" width="560" height="105" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="481" y="842" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="481" dy="0">LATER SETUP RECORD · planned</tspan>
+<tspan x="481" dy="21.75">SRCC=1 update opens a per-channel candidate.</tspan>
+<tspan x="481" dy="21.75">Accumulate fragments; SRCC is not a closing marker.</tspan>
+</text>
+<path d="M745 700 V815" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="770" y="760" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="770" dy="0">later setup (SRCC=1)</tspan>
+</text>
+<text x="35" y="755" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="35" dy="0">Next trusted TIME on ANY channel:</tspan>
+<tspan x="35" dy="21.75">seal later candidates → INT-034 →</tspan>
+<tspan x="35" dy="21.75">eligible declarations; then dispatch</tspan>
+<tspan x="35" dy="21.75">that SAME time packet.</tspan>
+</text>
+<path d="M465 865 H390 V650 H465" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="35" y="973" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="35" dy="0">TIME eligibility: 0x11; 0x12 only from 106-17 under the applicable edition binding.</tspan>
+<tspan x="35" dy="20.3">No marker yet: remain open/provisional. Actual EOF is a separate completeness basis, not an invented time packet.</tspan>
+</text>
+</svg>

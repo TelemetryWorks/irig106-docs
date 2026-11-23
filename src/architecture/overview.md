@@ -5,6 +5,10 @@ is the source of current-state claims. The core, decode, write, index, and share
 types repositories are scaffolds at that snapshot; this book does not define
 callable APIs for them.
 
+For the owner-directed **2026-11-23** design, including core 0.1.0 and the archived
+reader, see [how the libraries pass information](pipeline.md). The earlier
+snapshot statements on this page retain their 2026-11-10 scope.
+
 ## Separate traversal from interpretation
 
 The intended pipeline is:
