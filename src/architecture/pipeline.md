@@ -10,7 +10,7 @@ this page does not silently update its historical evidence.
 The owner has decided the layer responsibilities, one shared reader, per-channel
 setup assembly, initial and mid-recording closure by time packets, and initial
 ordering checks. The **coordinator-recommended** one-pass orchestrator is a
-planned design. The owner has also decided that the plain packet-facts type lives in
+planned design. The **owner decision of 2026-11-23** fixes the plain packet-facts type location in
 `irig106-types`: core produces the facts, the orchestrator passes them on, and
 TMATS consumes them without depending on core. The type and its integration
 remain **planned** until implemented.
@@ -35,8 +35,9 @@ One reader in core is the target: this does not claim every existing consumer
 has already removed its duplicate reader.
 
 Time remains a leaf library depending only on types (ADR-0005). The owner-decided
-TMATS leaf boundary uses a plain packet-facts type in `irig106-types`
-(**planned**). Core produces that shared value, the orchestrator passes it on,
+TMATS leaf boundary uses `PacketFacts` (**planned**), a header-facts-only type
+in `irig106-types`. The name is diagram notation, not a released API. This
+location is decided, not an open option (owner decision, 2026-11-23). Core produces that shared value, the orchestrator passes it on,
 and TMATS consumes it. TMATS stays independent of core; the orchestrator does
 not define a competing packet-facts type. No direct TMATS-to-core dependency
 is selected. Time gains no dependency on core or TMATS. Static dependencies
@@ -136,6 +137,12 @@ known clean recording start. Record findings and preserve the bytes when
 authoritative automatic adoption is withheld.
 
 ## Sources and authority
+
+**Decision citation — owner, 2026-11-23, assignment update:** “the plain
+'packet facts' type lives in irig106-types”. The same owner update specifies
+that core produces the facts, the orchestrator passes them on, and TMATS consumes
+them while staying independent of core. This is the authority for the decided
+boundary above; the type remains planned until implemented.
 
 Source inspection on 2026-11-23; no sibling builds or tests were run for this page.
 The owner request of that date is authority for the new closure/ordering decisions

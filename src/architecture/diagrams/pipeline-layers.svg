@@ -8,10 +8,11 @@
 <text x="35" y="68" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
 <tspan x="35" dy="0">Arrows point to the provider used. Solid: existing boundary. Dashed: planned use / integration.</tspan>
 </text>
-<rect x="410" y="100" width="340" height="66" rx="10" fill="#eaf4f8" stroke="#3d718c" stroke-width="1.7"/>
-<text x="426" y="127" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
-<tspan x="426" dy="0">irig106-types</tspan>
-<tspan x="426" dy="23.2">Shared values; packet facts planned</tspan>
+<rect x="260" y="90" width="640" height="90" rx="10" fill="#eaf4f8" stroke="#3d718c" stroke-width="1.7"/>
+<text x="276" y="115" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="276" dy="0">irig106-types · shared values</tspan>
+<tspan x="276" dy="23">PacketFacts (planned)</tspan>
+<tspan x="276" dy="23">header facts only; core produces, orchestrator passes, tmats consumes</tspan>
 </text>
 <rect x="410" y="212" width="340" height="80" rx="10" fill="#eaf4f8" stroke="#3d718c" stroke-width="1.7"/>
 <text x="426" y="239" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
@@ -19,7 +20,7 @@
 <tspan x="426" dy="21.75">ONE PacketReader; structure only</tspan>
 <tspan x="426" dy="21.75">FILE ORDER + byte offsets</tspan>
 </text>
-<path d="M580 212 V166" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M580 212 V180" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)"/>
 <rect x="95" y="350" width="400" height="90" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
 <text x="111" y="377" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
 <tspan x="111" dy="0">irig106-tmats · rebuild planned</tspan>
@@ -32,8 +33,8 @@
 <tspan x="681" dy="23.2">Leaf: depends only on types</tspan>
 <tspan x="681" dy="23.2">Bounded TimeView seam planned</tspan>
 </text>
-<path d="M295 350 V186 H450 V166" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
-<path d="M865 350 V186 H710 V166" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M295 350 V180" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<path d="M865 350 V180" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)"/>
 <rect x="410" y="496" width="340" height="65" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
 <text x="426" y="523" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
 <tspan x="426" dy="0">irig106-decode · planned</tspan>
@@ -61,7 +62,7 @@
 <path d="M330 745 V683" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
 <path d="M860 745 V683" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
 <text x="35" y="870" font-family="DejaVu Sans, sans-serif" font-size="17" fill="#183447" font-weight="bold">
-<tspan x="35" dy="0">OWNER DECISION · Packet facts belong to irig106-types (type planned)</tspan>
+<tspan x="35" dy="0">OWNER DECISION 2026-11-23 · PacketFacts belongs to irig106-types (planned)</tspan>
 </text>
 <rect x="35" y="890" width="1090" height="95" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
 <text x="51" y="917" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
