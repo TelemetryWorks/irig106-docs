@@ -10,7 +10,7 @@
 </text>
 <rect x="45" y="100" width="1070" height="85" rx="10" fill="#eaf4f8" stroke="#3d718c" stroke-width="1.7"/>
 <text x="61" y="127" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
-<tspan x="61" dy="0">irig106-core · ONE PacketReader</tspan>
+<tspan x="61" dy="0">irig106-core · ONE PacketReader · shared packet-facts output planned</tspan>
 <tspan x="61" dy="23.2">FILE ORDER; offset + channel + data type + sequence + flags + RTC</tspan>
 <tspan x="61" dy="23.2">Bounded DATA capture; structure/integrity evidence, not payload meaning</tspan>
 </text>
@@ -20,7 +20,7 @@
 <tspan x="61" dy="0">ORCHESTRATOR · planned</tspan>
 <tspan x="61" dy="21.75">CLI app, or future pipeline crate (planned)</tspan>
 <tspan x="61" dy="21.75"></tspan>
-<tspan x="61" dy="21.75">For EVERY packet, first forward header facts.</tspan>
+<tspan x="61" dy="21.75">For EVERY packet: pass on core facts.</tspan>
 <tspan x="61" dy="21.75">For setup packets, also forward CSDW/body.</tspan>
 <tspan x="61" dy="21.75">Keep file order; never sort packets by RTC.</tspan>
 <tspan x="61" dy="21.75"></tspan>

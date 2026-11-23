@@ -10,12 +10,14 @@ this page does not silently update its historical evidence.
 The owner has decided the layer responsibilities, one shared reader, per-channel
 setup assembly, initial and mid-recording closure by time packets, and initial
 ordering checks. The **coordinator-recommended** one-pass orchestrator is a
-planned design. The location of the packet-facts input type remains an **open
-owner decision**; neither option below is selected.
+planned design. The owner has also decided that the plain packet-facts type lives in
+`irig106-types`: core produces the facts, the orchestrator passes them on, and
+TMATS consumes them without depending on core. The type and its integration
+remain **planned** until implemented.
 
 ## 1. Layers and dependencies
 
-![Crate layers, provider-directed dependency arrows, and two open packet-facts seam options](diagrams/pipeline-layers.png)
+![Crate layers, provider-directed dependency arrows, and the decided shared packet-facts boundary](diagrams/pipeline-layers.png)
 
 [SVG source](diagrams/pipeline-layers.svg) · [PNG export](diagrams/pipeline-layers.png)
 
@@ -32,15 +34,12 @@ The umbrella `irig106-cli` is intended to mount the time and TMATS CLI libraries
 One reader in core is the target: this does not claim every existing consumer
 has already removed its duplicate reader.
 
-Time remains a leaf library depending only on types (ADR-0005). The recommended
-TMATS leaf boundary uses plain data; its packet-facts seam is still open:
-
-| Open option | Planned input boundary | Effect |
-| --- | --- | --- |
-| A: shared plain facts | Packet-facts type in `irig106-types`; orchestrator adapts core output | Keeps TMATS independent of core |
-| B: direct core dependency | TMATS accepts facts through a dependency on `irig106-core` | Couples TMATS's input contract to core; not the leaf-boundary option |
-
-Neither option adds a time-to-core or time-to-TMATS dependency. Static dependencies
+Time remains a leaf library depending only on types (ADR-0005). The owner-decided
+TMATS leaf boundary uses a plain packet-facts type in `irig106-types`
+(**planned**). Core produces that shared value, the orchestrator passes it on,
+and TMATS consumes it. TMATS stays independent of core; the orchestrator does
+not define a competing packet-facts type. No direct TMATS-to-core dependency
+is selected. Time gains no dependency on core or TMATS. Static dependencies
 and runtime calls are distinct: the recommended orchestration below has no
 semantic library call another semantic library to walk the recording.
 
@@ -54,7 +53,8 @@ The **planned orchestrator** lives in a CLI application or a future pipeline
 crate. It drives one `irig106_core::PacketReader` in **file order**, retaining byte
 offsets. It never sorts by RTC before assembly. For each packet it:
 
-1. Forwards channel, header data type, sequence, flags, offset, RTC, and relevant
+1. Passes on core-produced plain packet facts (shared type in `irig106-types`,
+   **planned**): channel, header data type, sequence, flags, offset, RTC, and relevant
    trust/edition evidence to TMATS's **planned** observation seam. For a Format 1
    setup packet, it also supplies that fragment's CSDW and body. `SetupAssembler.observe(...)`
    is conceptual notation here, not a verified callable Rust signature.
