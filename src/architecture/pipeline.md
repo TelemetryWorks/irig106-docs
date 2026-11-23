@@ -52,23 +52,25 @@ semantic library call another semantic library to walk the recording.
 
 The **planned orchestrator** lives in a CLI application or a future pipeline
 crate. It drives one `irig106_core::PacketReader` in **file order**, retaining byte
-offsets. It never sorts by RTC before assembly. For each packet it:
+offsets. It never sorts by RTC before assembly. The owner-approved **planned**
+selective dispatch below refines the original all-header forwarding proposal:
 
-1. Passes on core-produced plain packet facts (shared type in `irig106-types`,
-   **planned**): channel, header data type, sequence, flags, offset, RTC, and relevant
-   trust/edition evidence to TMATS's **planned** observation seam. For a Format 1
-   setup packet, it also supplies that fragment's CSDW and body. `SetupAssembler.observe(...)`
-   is conceptual notation here, not a verified callable Rust signature.
-2. Lets TMATS track independent per-channel runs, ordering, and closure. On seal,
-   TMATS assesses completeness separately (INT-034), parses eligible complete
-   records, and returns **planned** bounded `TimeView` / channel declarations as
-   plain data with provenance, qualification, and findings.
-3. Routes time packets and qualified declarations to time. For a closing time
-   marker, observation and setup assessment happen **before** dispatching that
-   **same** packet for time interpretation; the marker is never setup text.
-4. Routes data packets with qualified declarations and time answers to
-   `irig106-decode` (**planned**). Results retain their basis and findings rather
-   than inventing missing metadata or an absolute time.
+1. Classify each packet once from its header data-type byte. Setup packets go
+   to TMATS with core-produced plain `PacketFacts` (**planned**), CSDW and body.
+   TMATS observes every header **only during the initial setup phase**, so it
+   can enforce initial ordering and recognize the first trusted time marker.
+   `SetupAssembler.observe(...)` is conceptual notation, not a released API.
+2. TMATS tracks independent per-channel candidates. An eligible time marker
+   notifies TMATS only while a candidate is open, including a later setup
+   candidate. On seal, INT-034 assesses completeness separately; eligible
+   parsing produces qualified plain declarations and findings (**planned**).
+3. Time packets go to time with the qualified declarations. When a packet also
+   closes setup, the cheap header-only marker notification and setup assessment
+   precede time interpretation of that **same** packet. Its payload is not
+   decoded by TMATS or included in setup text.
+4. Data packets go only to decode, with qualified declarations and time answers
+   (**planned**). After the initial phase, they are not dispatched to TMATS.
+   Missing metadata or time basis remains explicit rather than invented.
 
 Core checks framing and exposes integrity evidence, not TMATS validity, time
 meaning, or complete standard conformance. Its bounded `body_prefix` can be only
@@ -135,6 +137,90 @@ a first observed setup packet, or successful sync recovery. Retain that provenan
 unknown/cropped start or untrusted prefix evidence must not silently become a
 known clean recording start. Record findings and preserve the bytes when
 authoritative automatic adoption is withheld.
+
+## 5. Performance design
+
+**Owner approved, 2026-11-23; implementation planned.** These are design targets,
+not measured throughput, allocation counts, or capabilities of core 0.1.
+
+### One dispatch per packet (planned)
+
+The orchestrator reads the header's data-type byte **once** for a `match` or jump
+table and routes the packet only to the consumer that needs it:
+
+| Packet / phase | Planned route |
+| --- | --- |
+| Data packets (expected to dominate normal recordings) | Decode only, with qualified declarations and time answers |
+| Time packet | Time; additionally a cheap header-only time-marker notification to TMATS **only while a setup candidate is open** |
+| Setup packet | TMATS, with CSDW and body |
+| Initial setup phase | TMATS also observes every header until the first trusted time boundary, including headers needed to report an ordering violation |
+
+The initial ordering check is the explicit exception to selective data dispatch.
+Outside that phase, there is no general per-packet TMATS callback. The header-only
+marker notification is not a second payload consumer or a second packet read.
+Other unsupported packet types retain explicit handling/findings; they are not
+misclassified as supported data. File order, trust and edition checks still apply.
+
+### Small facts and borrowed bodies (planned)
+
+`PacketFacts` is a small **Copy**, header-facts-only value in `irig106-types`,
+with a target size of **about 32 bytes** and no heap storage, passed by value or
+reference. This is a proposed layout budget, not a verified `size_of` or a
+released type. Core produces it; the orchestrator passes it to the selected
+consumer without TMATS depending on core.
+
+Payload slices are **borrowed `&[u8]` from one reader buffer**, with no payload
+copy between libraries on the synchronous data path (**planned**). A borrow may
+not survive reuse or growth of its backing buffer. This does not promise no
+kernel-to-user copy, allocation-free setup assembly, or copy-free owned exports.
+
+### Reuse packet storage: planned core 0.2 API
+
+The data path targets **no per-packet allocation after sufficient buffer capacity
+has been established**. A reusable grow-on-demand buffer is sized from the
+validated header's **Packet Length before reading the body**, subject to the
+caller's explicit maximum. Check lengths, overflow and the cap before reserving
+storage. Growth may allocate when a larger permitted packet first arrives;
+subsequent packets reuse that capacity. Storage follows the largest accepted
+packet's capacity high-water mark, not the recording's byte count. There is no
+whole-file buffering or unchecked allocation from a wire length.
+
+**Current core 0.1 differs:** its
+[reader implementation](https://github.com/TelemetryWorks/irig106-core/blob/3c12bcd33b1ae66cca2d6378f4bfe08f2fc8c9a1/crates/irig106-core/src/reader.rs)
+creates an owned `Vec` capture per packet and reserves the requested DATA prefix
+(nonzero capture can allocate). Its bounded `body_prefix` is not the planned
+reusable borrowed-payload API. No core code or public API changes are made here.
+
+### Ordered reader, bounded worker fan-out (planned)
+
+Keep **one ordered reader**: setup closure, initial ordering and time-reference
+updates stay on the ordered path. Fan out per **channel** to workers through
+bounded channels, preserving order within each channel. Do not let worker
+completion reorder the observations used for setup and time context.
+
+A **fixed-size buffer pool** supports ownership transfer: the reader fills a
+pool buffer, moves ownership to a worker, and receives the buffer back after use.
+A worker borrows payload slices from the buffer it owns; a borrowed slice alone
+cannot outlive that buffer. This extends the synchronous one-buffer design
+without copying payloads between libraries. When the pool/queues are full, use
+backpressure rather than allocating more buffers. Pool payload storage is bounded
+by **pool size × maximum packet capacity**, plus fixed metadata and separately
+bounded queue, assembler, and worker state; this is not a whole-process RSS claim.
+
+Time correlation stays on the ordered path. Time-reference updates are expected
+to be cheap and around **1 Hz per time channel**, not necessarily once per second
+for the whole recording. That is a design expectation, not a measured CPU cost or
+an enforced rate cap; data-time answer queries can be much more frequent.
+
+### Measure before claiming a speedup (planned)
+
+Add reproducible **throughput** and **allocations-per-packet** benchmarks and a
+CI regression gate, following the existing RSS-regression approach. Cover steady
+state separately from first-packet/growth allocations, varying packet sizes,
+setup/time transitions, channel count and pool backpressure. Report hardware,
+fixtures, capture/validation settings, capacity limits and allocation accounting.
+The current core RSS test does not prove any of these new targets. No throughput
+result, zero-allocation measurement, or performance CI gate is claimed here.
 
 ## Sources and authority
 

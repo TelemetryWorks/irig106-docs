@@ -99,6 +99,6 @@
 <text x="45" y="995" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
 <tspan x="45" dy="0">Time marker: trusted header type 0x11, or 0x12 from 106-17, on ANY channel; no time decoding needed.</tspan>
 <tspan x="45" dy="20.3">Channels 7/9 illustrate pre-106-17 setup; modern setup-channel-0 conformance is a separate check.</tspan>
-<tspan x="45" dy="20.3">All packet headers are observed; selected events shown. SRCC=1 is evidence, not proof of completeness.</tspan>
+<tspan x="45" dy="20.3">Initial phase: all headers to TMATS; later: time markers only while a candidate is open. SRCC ≠ completeness.</tspan>
 </text>
 </svg>

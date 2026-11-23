@@ -19,17 +19,17 @@
 <text x="61" y="267" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
 <tspan x="61" dy="0">ORCHESTRATOR · planned</tspan>
 <tspan x="61" dy="21.75">CLI app, or future pipeline crate (planned)</tspan>
-<tspan x="61" dy="21.75"></tspan>
-<tspan x="61" dy="21.75">For EVERY packet: pass on core facts.</tspan>
-<tspan x="61" dy="21.75">For setup packets, also forward CSDW/body.</tspan>
-<tspan x="61" dy="21.75">Keep file order; never sort packets by RTC.</tspan>
+<tspan x="61" dy="21.75">Initial phase: TMATS sees every header.</tspan>
+<tspan x="61" dy="21.75">For EVERY packet: one type-byte dispatch.</tspan>
+<tspan x="61" dy="21.75">Setup: TMATS gets facts + CSDW/body.</tspan>
+<tspan x="61" dy="21.75">Time marker to TMATS only if candidate open.</tspan>
 <tspan x="61" dy="21.75"></tspan>
 <tspan x="61" dy="21.75">On seal: assess completeness, then parse</tspan>
 <tspan x="61" dy="21.75">eligible records into qualified declarations.</tspan>
 <tspan x="61" dy="21.75">Do not treat a boundary as completeness.</tspan>
 <tspan x="61" dy="21.75"></tspan>
 <tspan x="61" dy="21.75">Dispatch the SAME time marker afterwards.</tspan>
-<tspan x="61" dy="21.75">Route data with declarations + time answers.</tspan>
+<tspan x="61" dy="21.75">Data packets go ONLY to decode.</tspan>
 <tspan x="61" dy="21.75"></tspan>
 <tspan x="61" dy="21.75">Caller owns capture and finite memory limits.</tspan>
 <tspan x="61" dy="21.75">No hidden second scan; no unbounded backlog.</tspan>
@@ -44,7 +44,7 @@
 </text>
 <path d="M485 280 H675" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
 <text x="500" y="267" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
-<tspan x="500" dy="0">facts + setup bytes</tspan>
+<tspan x="500" dy="0">setup / initial facts</tspan>
 </text>
 <path d="M675 360 H485" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
 <text x="500" y="347" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
