@@ -22,9 +22,9 @@
 <tspan x="61" dy="21.75">Initial phase: TMATS sees every header.</tspan>
 <tspan x="61" dy="21.75">For EVERY packet: one type-byte dispatch.</tspan>
 <tspan x="61" dy="21.75">Setup: TMATS gets facts + CSDW/body.</tspan>
-<tspan x="61" dy="21.75">Time marker to TMATS only if candidate open.</tspan>
+<tspan x="61" dy="21.75">Time marker: initial / FIRST SRCC=1 only.</tspan>
 <tspan x="61" dy="21.75"></tspan>
-<tspan x="61" dy="21.75">On seal: assess completeness, then parse</tspan>
+<tspan x="61" dy="21.75">On seal: assess revisable outcome, then parse</tspan>
 <tspan x="61" dy="21.75">eligible records into qualified declarations.</tspan>
 <tspan x="61" dy="21.75">Do not treat a boundary as completeness.</tspan>
 <tspan x="61" dy="21.75"></tspan>

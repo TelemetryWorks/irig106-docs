@@ -11,16 +11,16 @@
 <rect x="40" y="110" width="300" height="110" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
 <text x="56" y="137" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
 <tspan x="56" dy="0">FIXED BUFFER POOL · planned</tspan>
-<tspan x="56" dy="20.3">N reusable buffers; grow to fit</tspan>
-<tspan x="56" dy="20.3">the largest accepted packet</tspan>
+<tspan x="56" dy="20.3">N reusable buffers; FIXED cap</tspan>
+<tspan x="56" dy="20.3">independent of Packet Length</tspan>
 <tspan x="56" dy="20.3">No buffer available → reader waits</tspan>
 </text>
 <rect x="430" y="110" width="400" height="110" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
 <text x="446" y="137" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
 <tspan x="446" dy="0">ONE ORDERED READER · core 0.2 planned</tspan>
 <tspan x="446" dy="20.3">File / network / pipe → header → body</tspan>
-<tspan x="446" dy="20.3">Validate Packet Length; cap before growth</tspan>
-<tspan x="446" dy="20.3">Over caller ceiling → typed error</tspan>
+<tspan x="446" dy="20.3">Fixed buffer + caller-selected capture cap</tspan>
+<tspan x="446" dy="20.3">Excess: drain / chunks; report incomplete</tspan>
 </text>
 <path d="M340 165 H430" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
 <text x="350" y="150" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
@@ -44,7 +44,7 @@
 <tspan x="56" dy="20.3">Setup assembly + time interpretation</tspan>
 <tspan x="56" dy="20.3">Plain PacketFacts in types (planned)</tspan>
 <tspan x="56" dy="20.3">Header-only time marker to TMATS</tspan>
-<tspan x="56" dy="20.3">only while a candidate is open</tspan>
+<tspan x="56" dy="20.3">initial / FIRST SRCC=1 only</tspan>
 </text>
 <path d="M430 370 H340" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
 <rect x="910" y="310" width="210" height="130" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
@@ -75,7 +75,7 @@
 <tspan x="450" dy="0">RETURN ownership to the pool; no payload copy</tspan>
 </text>
 <text x="40" y="755" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
-<tspan x="40" dy="0">Pool payload storage ≤ N × largest retained packet capacity (≤ caller cap per buffer).</tspan>
-<tspan x="40" dy="20.3">Add separately bounded queue/assembler/worker state; not a total-RSS formula. No EOF needed for time-marker closure.</tspan>
+<tspan x="40" dy="0">Pool payload storage ≤ N × fixed buffer cap, independent of declared packet size.</tspan>
+<tspan x="40" dy="20.3">Keep L1-CORE-002 / L2-IO-002. Explicit incomplete/limit evidence; separately bound queues and semantic state.</tspan>
 </text>
 </svg>

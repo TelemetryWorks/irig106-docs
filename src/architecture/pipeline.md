@@ -58,11 +58,13 @@ selective dispatch below refines the original all-header forwarding proposal:
 1. Classify each packet once from its header data-type byte. Setup packets go
    to TMATS with core-produced plain `PacketFacts` (**planned**), CSDW and body.
    TMATS observes every header **only during the initial setup phase**, so it
-   can enforce initial ordering and recognize the first trusted time marker.
+   can enforce initial ordering and recognize the first observed time candidate (without skipping an untrusted one).
    `SetupAssembler.observe(...)` is conceptual notation, not a released API.
 2. TMATS tracks independent per-channel candidates. An eligible time marker
-   notifies TMATS only while a candidate is open, including a later setup
-   candidate. On seal, INT-034 assesses completeness separately; eligible
+   notifies TMATS only while a closure-eligible candidate is open: initial setup
+   or a later candidate whose **first fragment has SRCC=1**. First-fragment
+   SRCC=0 retransmissions remain open/provisional outside the extension. On seal,
+   INT-034 assesses completeness separately; eligible
    parsing produces qualified plain declarations and findings (**planned**).
 3. Time packets go to time with the qualified declarations. When a packet also
    closes setup, the cheap header-only marker notification and setup assessment
@@ -97,27 +99,52 @@ carry-forward or provisional-use policy is invented here.
   or interrupt a run. Preserve sequence progression, FRMT/RCCVER agreement,
   fragment provenance, and start/stop evidence. The channel-0 restriction from
   106-17 is an independent conformance check, not permission to merge runs.
-- **Initial closure (INT-045).** The first structurally trusted TIME packet on
-  **any channel** closes the initial per-channel setup candidates immediately
-  before that marker. Its header data type is `0x11`, or `0x12` where defined
+- **Initial closure (INT-045).** The **first observed TIME candidate** on any
+  channel supplies the initial boundary only if it is structurally trusted and
+  eligible. If that first candidate is untrusted, adoption is withheld; a later
+  trusted candidate **does not replace it** as the initial boundary. The eligible
+  header data type is `0x11`, or `0x12` where defined
   from 106-17, under the applicable edition binding. Unknown/reserved types and
   timestamps embedded in other packet bodies are not this signal.
-- **Mid-recording closure.** The next eligible trusted time packet also closes
-  a later setup record, including an update with SRCC=1. This owner decision
-  extends the initial-only proposal in the inspected INT-045 draft.
+- **Mid-recording closure.** The next eligible trusted time packet closes a
+  candidate **only if its FIRST fragment has trusted SRCC=1**. Later fragment
+  bits, majority votes, or repeated SRCC=1 bits do not change eligibility or
+  restart the candidate. First-fragment SRCC=0 retransmissions stay outside
+  this owner extension, open/provisional, even if a later fragment says 1.
 - **Header facts suffice for closure.** No time payload decoding, usable clock,
   UTC answer, or time-source selection is needed to recognize the boundary.
   Header/edition trust still matters; corrupt or unreadable bytes are not a
   trusted marker merely because they resemble a type code.
 
 A sealed run is not automatically complete or governing. INT-034 independently
-assesses complete/incomplete/ambiguous outcomes with their evidence; closure
-cannot repair truncated text, resolve duplicate/split ambiguity, or choose one
-candidate across channels. A valid complete outcome and adoption eligibility
-remain separate gates. A live run without a marker remains open/provisional;
-actual EOF has its own labelled completeness basis and missing-time finding,
-not a fabricated time marker. Detailed INT-034 precedence and provisional
-semantic use remain subject to their own reviewed contracts.
+assesses complete/incomplete/ambiguous outcomes. Cut-mid-attribute text is
+**Incomplete**, with a located finding, not held open for repair by later text.
+Closure cannot choose a governing candidate, fix duplicate/split ambiguity, or
+waive normal validity and integrity gates.
+
+**Premature-seal guard (planned implementation).** A same-channel +1 continuation
+with the same FRMT/RCCVER after a time-boundary seal makes an otherwise Complete
+semicolon-ending candidate **Ambiguous**, with both readings retained and a
+located **“possible premature time-boundary seal”** finding naming the seal and
+continuation. Never rejoin the sealed and later bytes. If reviewed, unambiguous
+`G\SHA` verification **matches the sealed text alone**, that otherwise Complete
+candidate may stay Complete on that explicit classification evidence. Missing,
+mismatching, malformed, unsupported, unavailable, unverified or indeterminate
+verification does not qualify; never stamp or normalize text to obtain a match.
+Continuity, both readings and the finding remain visible even under this
+exception; it is not an authoritative checksum verdict for an unresolved record.
+The existing Incomplete outcome is never repaired by this guard.
+
+Every mid-session Complete produced by the extension carries the basis
+**`time-boundary seal (owner policy)`**, naming the verified `G\SHA` evidence too
+when applicable. **Seal outcomes are revisable** when later continuity arrives:
+retain candidate identity, the earlier boundary and revised findings. This fits
+time's spool-before-publish contract; no timeout makes a seal irrevocable, and
+no publication/spooling implementation is claimed here.
+
+A live run without an eligible marker remains open/provisional. Actual EOF has
+its own labelled INT-034 completeness basis, not a fabricated time marker.
+Provisional use and governing applicability still require their own contracts.
 
 ## 4. Ordering and caller-asserted start
 
@@ -128,9 +155,10 @@ semantic use remain subject to their own reviewed contracts.
 Only **static Computer-Generated Format 1 setup packets** may precede the first
 time packet. Any other intervening packet is an ordering violation: record a
 finding and withhold adoption through this automatic path. A later time marker
-can seal candidates but does not erase the violation. The state diagram's later
-SRCC=1 setup is after the initial time boundary, not an exception to the initial
-static-prefix rule; SRCC alone neither closes nor proves a complete record.
+does not erase an ordering violation or replace an untrusted first observed time
+candidate as the initial boundary. The state diagram's later
+first-fragment SRCC=1 setup is after the initial time boundary, not an exception
+to the initial static-prefix rule; SRCC alone neither closes nor proves a complete record.
 
 **Known start is asserted by the caller**, not inferred from a file offset,
 a first observed setup packet, or successful sync recovery. Retain that provenance;
@@ -151,9 +179,9 @@ table and routes the packet only to the consumer that needs it:
 | Packet / phase | Planned route |
 | --- | --- |
 | Data packets (expected to dominate normal recordings) | Decode only, with qualified declarations and time answers |
-| Time packet | Time; additionally a cheap header-only time-marker notification to TMATS **only while a setup candidate is open** |
+| Time packet | Time; additionally a cheap header-only time-marker notification to TMATS **only while a closure-eligible setup candidate is open** |
 | Setup packet | TMATS, with CSDW and body |
-| Initial setup phase | TMATS also observes every header until the first trusted time boundary, including headers needed to report an ordering violation |
+| Initial setup phase | TMATS also observes every header through the first observed time candidate, whose trust is checked without skipping it, including headers needed to report an ordering violation |
 
 The initial ordering check is the explicit exception to selective data dispatch.
 Outside that phase, there is no general per-packet TMATS callback. The header-only
@@ -171,19 +199,35 @@ consumer without TMATS depending on core.
 
 Payload slices are **borrowed `&[u8]` from one reader buffer**, with no payload
 copy between libraries on the synchronous data path (**planned**). A borrow may
-not survive reuse or growth of its backing buffer. This does not promise no
+not survive reuse of its backing buffer. In the planned API, large bodies use
+fixed-size chunks or an explicitly larger capture cap;
+this is not a promise of a whole-packet slice for every declared length. This does not promise no
 kernel-to-user copy, allocation-free setup assembly, or copy-free owned exports.
 
 ### Reuse packet storage: planned core 0.2 API
 
-The data path targets **no per-packet allocation after sufficient buffer capacity
-has been established**. A reusable grow-on-demand buffer is sized from the
-validated header's **Packet Length before reading the body**, subject to the
-caller's explicit maximum. Check lengths, overflow and the cap before reserving
-storage. Growth may allocate when a larger permitted packet first arrives;
-subsequent packets reuse that capacity. Storage follows the largest accepted
-packet's capacity high-water mark, not the recording's byte count. There is no
-whole-file buffering or unchecked allocation from a wire length.
+The caller chooses **fixed buffer and capture sizes**. Reuse storage up to those
+caps to avoid per-packet allocation; **never grow storage to Packet Length**.
+Header length is framing evidence used to determine how much to consume, not an
+allocation request. For a body larger than the capture cap, drain/skip the
+uncaptured bytes, or deliver fixed-size chunks to a streaming consumer
+(**planned** chunk/reuse API). Formats needing a whole large packet must explicitly
+opt into a larger caller-selected cap or support chunked decoding.
+
+Over-cap handling is **never silent truncation**: expose capture-incomplete
+evidence or a typed limit, as appropriate to the requested operation. Today core
+clamps requested capture to DATA length, checks the explicit capture limit and
+drains uncaptured DATA/trailer; an oversized packet need not be rejected merely
+because only a prefix was requested. A prefix is never passed off as a full body.
+
+Any core 0.2 API must preserve **L1-CORE-002** (memory independent of recording
+and declared packet size) and **L2-IO-002** (no Packet-Length allocations).
+Changing either needs an **owner-approved requirement change plus an RSS control**;
+this documentation does not authorize one. Core slice 8's **64 MiB packet with
+four-byte capture** is the existing counterexample to packet-sized buffering,
+not evidence for it. Memory is determined by explicit caps, independent of
+packet size. See the pinned [core requirements](https://github.com/TelemetryWorks/irig106-core/blob/3c12bcd33b1ae66cca2d6378f4bfe08f2fc8c9a1/docs/requirements.md)
+and [slice 8 evidence](https://github.com/TelemetryWorks/irig106-core/blob/3c12bcd33b1ae66cca2d6378f4bfe08f2fc8c9a1/docs/verification-s08.md).
 
 **Current core 0.1 differs:** its
 [reader implementation](https://github.com/TelemetryWorks/irig106-core/blob/3c12bcd33b1ae66cca2d6378f4bfe08f2fc8c9a1/crates/irig106-core/src/reader.rs)
@@ -200,14 +244,14 @@ the core 0.2 target, not the current core 0.1 owned-capture API.
 
 [SVG source](diagrams/pipeline-buffers.svg) · [PNG export](diagrams/pipeline-buffers.png)
 
-**Buffer sizing.** The header provides Packet Length before the body is read.
-After structural validation and overflow checks, grow a reusable buffer only as
-needed and retain its capacity for later packets. Memory follows the largest
-accepted packet's retained capacity, not the file size. A caller-set ceiling
-makes an over-limit packet a **typed error before growth or body reading**.
-The standard's packet-size cap still needs confirmation with an exact
-edition/section citation in the core proposal; this page adopts no numeric
-standard limit and does not substitute the caller's ceiling for that requirement.
+**Buffer sizing.** Packet Length is known before reading the body, but must not
+size the allocation. The caller selects fixed buffer/capture caps; reusable
+storage stays within them. Excess body bytes are drained/skipped, or streamed in
+fixed-size chunks (**planned**). Whole-packet formats require an explicit larger
+cap or chunk-capable decoding. Capture-incomplete evidence or a typed limit
+reports over-cap handling; no silent truncation. Memory does **not** follow the
+largest declared packet. The standard's packet-size cap still needs an exact
+edition/section citation in the core proposal; no numeric cap is asserted here.
 
 **Is concurrency useful?** These are workload expectations to benchmark, not
 measured results or universal classifications:
@@ -231,25 +275,25 @@ owns and returns ownership to the pool after use. A slice alone cannot outlive
 its backing buffer. There is no inter-library payload copy in this planned path,
 and no unlimited buffer creation when workers fall behind.
 
-Pool payload storage is bounded by **pool size × largest retained packet
-capacity**, with the caller's ceiling bounding each buffer. This is an upper
-bound when buffers have different capacities; add fixed metadata and separately
-bounded queue, assembler and worker state. It is not a whole-process RSS formula.
-Growth allocations remain possible when an accepted packet exceeds the previous
-high-water mark; steady-state reuse is the no-per-packet-allocation target.
+Pool payload storage is bounded by **pool size × fixed buffer cap**, independent
+of declared packet size. Allocate/reuse at the configured cap, not by growth to a
+packet high-water mark. Add fixed metadata and separately bounded queue,
+assembler and worker state; this is not a whole-process RSS formula. Oversized
+bodies require explicit partial-capture evidence, chunk handling, or typed limits.
 
 **Live streaming.** Use the same ownership and dispatch shape for network or
 pipe input after the applicable transport framing adapter. Bounded queues give
 **backpressure**: the reader waits if a worker queue is full or no pool buffer is
 free. A transport that cannot be paused, such as a UDP sender, may still lose
-packets upstream; bounded memory is not a lossless-delivery guarantee. Setup
-closes at the next eligible trusted time packet, initially or mid-recording, so
-that closure **does not require EOF**. No time marker means the candidate stays
+packets upstream; bounded memory is not a lossless-delivery guarantee. Eligible setup closes at a trusted time boundary **without EOF**: the initial
+boundary must be the first observed time candidate, and mid-session closure
+requires first-fragment SRCC=1. First-fragment SRCC=0 remains open/provisional;
+an untrusted first time candidate cannot be replaced for initial adoption. No time marker means the candidate stays
 open/provisional; do not synthesize EOF or silently relax completeness checks.
 
 | Location | Planned responsibility |
 | --- | --- |
-| `irig106-core` 0.2 | The one reader, reusable owned buffers suitable for `Send` transfer, checked sizing and typed ceiling errors |
+| `irig106-core` 0.2 | The one reader, reusable owned buffers suitable for `Send` transfer, fixed buffer/capture caps, drain or planned fixed-size chunk delivery, explicit incomplete/limit evidence |
 | Orchestrator | Type dispatch, fixed pool, bounded queues, per-channel scheduling and ordered setup/time context |
 | `irig106-types` | Small header-only `PacketFacts` shared by producer and consumers |
 | TMATS / time / decode leaves | Selected semantic work; no second reader, hidden queue or recording walk. Time depends only on types; TMATS stays independent of core |
@@ -263,7 +307,7 @@ an enforced rate cap; data-time answer queries can be much more frequent.
 
 Add reproducible **throughput** and **allocations-per-packet** benchmarks and a
 CI regression gate, following the existing RSS-regression approach. Cover steady
-state separately from first-packet/growth allocations, varying packet sizes,
+state separately from configured buffer/pool initialization allocations, varying packet sizes,
 setup/time transitions, channel count and pool backpressure. Report hardware,
 fixtures, capture/validation settings, capacity limits and allocation accounting.
 The current core RSS test does not prove any of these new targets. No throughput
@@ -278,23 +322,26 @@ them while staying independent of core. This is the authority for the decided
 boundary above; the type remains planned until implemented.
 
 Source inspection on 2026-11-23; no sibling builds or tests were run for this page.
-The owner request of that date is authority for the new closure/ordering decisions
-above. The pinned TMATS sources below still call INT-045 an **unapproved,
-initial-only proposal**; they do not yet record the owner's new mid-recording
-extension. These diagrams document the new direction as **planned**, not as a
-shipped assembler or a retroactive change to those source records.
+The owner review handoff of 2026-11-23 records INT-045 as **approved**, including
+the initial rule and first-fragment SRCC=1 mid-session extension, with independent
+AI **CONCUR at `79b94eb`** (merged as `8eefd96` in
+[TMATS PR #41](https://github.com/TelemetryWorks/irig106-tmats/pull/41)). The pinned
+contract contains the amended safety rules; its older “recheck pending” status
+labels predate that reported concurrence. Approval is design authority, not
+implementation or test completion. Assembly, borrowed-buffer reuse, chunked
+consumption and the orchestration shown here remain **planned**.
 
 - Core `3c12bcd`: [0.1 API](https://github.com/TelemetryWorks/irig106-core/blob/3c12bcd33b1ae66cca2d6378f4bfe08f2fc8c9a1/docs/api.md)
   and [requirements](https://github.com/TelemetryWorks/irig106-core/blob/3c12bcd33b1ae66cca2d6378f4bfe08f2fc8c9a1/docs/requirements.md).
 - Time `5899806`: [architecture](https://github.com/TelemetryWorks/irig106-time/blob/5899806ae684ed38d8cad8f422cabb3d47c6be0f/docs/architecture.md),
   [ADR-0005 leaf boundary](https://github.com/TelemetryWorks/irig106-time/blob/5899806ae684ed38d8cad8f422cabb3d47c6be0f/docs/adr/0005-leaf-library-depending-only-on-irig106-types.md),
   and [ADR-0021 time-view seam](https://github.com/TelemetryWorks/irig106-time/blob/5899806ae684ed38d8cad8f422cabb3d47c6be0f/docs/adr/0021-tmats-release-and-bounded-time-view.md).
-- TMATS `0a9f010`: [release/time-view contract](https://github.com/TelemetryWorks/irig106-tmats/blob/0a9f010cdd031bfb967cd21a495924558e9112d7/docs/RELEASE-0.1.md),
-  [INT-011](https://github.com/TelemetryWorks/irig106-tmats/blob/0a9f010cdd031bfb967cd21a495924558e9112d7/docs/INTERPRETATIONS.md#int-011),
-  [INT-034](https://github.com/TelemetryWorks/irig106-tmats/blob/0a9f010cdd031bfb967cd21a495924558e9112d7/docs/INTERPRETATIONS.md#int-034),
-  [INT-045](https://github.com/TelemetryWorks/irig106-tmats/blob/0a9f010cdd031bfb967cd21a495924558e9112d7/docs/INTERPRETATIONS.md#int-045),
-  [ADR-0025 assembly](https://github.com/TelemetryWorks/irig106-tmats/blob/0a9f010cdd031bfb967cd21a495924558e9112d7/docs/adr/0025-setup-record-assembly-contract.md),
-  and [ADR-0031 completeness](https://github.com/TelemetryWorks/irig106-tmats/blob/0a9f010cdd031bfb967cd21a495924558e9112d7/docs/adr/0031-setup-record-completeness.md).
+- TMATS `8eefd96`: [release/time-view contract](https://github.com/TelemetryWorks/irig106-tmats/blob/8eefd96c30f80cdf676aa0a13e090bbebe948e2d/docs/RELEASE-0.1.md),
+  [INT-011](https://github.com/TelemetryWorks/irig106-tmats/blob/8eefd96c30f80cdf676aa0a13e090bbebe948e2d/docs/INTERPRETATIONS.md#int-011),
+  [INT-034](https://github.com/TelemetryWorks/irig106-tmats/blob/8eefd96c30f80cdf676aa0a13e090bbebe948e2d/docs/INTERPRETATIONS.md#int-034),
+  [INT-045](https://github.com/TelemetryWorks/irig106-tmats/blob/8eefd96c30f80cdf676aa0a13e090bbebe948e2d/docs/INTERPRETATIONS.md#int-045),
+  [ADR-0025 assembly](https://github.com/TelemetryWorks/irig106-tmats/blob/8eefd96c30f80cdf676aa0a13e090bbebe948e2d/docs/adr/0025-setup-record-assembly-contract.md),
+  and [ADR-0031 completeness](https://github.com/TelemetryWorks/irig106-tmats/blob/8eefd96c30f80cdf676aa0a13e090bbebe948e2d/docs/adr/0031-setup-record-completeness.md).
 
 SVGs are self-contained XML with accessible titles/descriptions and no external
 fonts, scripts, or images. The small committed PNGs are rendered from their
