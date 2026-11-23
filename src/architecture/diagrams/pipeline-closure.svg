@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="1220" viewBox="0 0 1160 1220" role="img" aria-labelledby="title desc">
+<title id="title">3 · Setup closure: initial and mid-recording</title><desc id="desc">Owner-directed planned sequence. Setup fragments join separately by channel. The first observed time candidate must be trusted for initial closure; later closure requires first-fragment SRCC=1. Outcomes are revisable. Eligible time headers seal runs before the same marker is dispatched to time. Completeness and adoption remain separate.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#365670"/></marker></defs>
+<rect width="1160" height="1220" fill="#fff"/>
+<text x="35" y="38" font-family="DejaVu Sans, sans-serif" font-size="24" fill="#132e42" font-weight="bold">
+<tspan x="35" dy="0">3 · Setup closure: initial and mid-recording</tspan>
+</text>
+<text x="35" y="68" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
+<tspan x="35" dy="0">Owner direction 2026-11-23 · orchestration / assembler integration planned</tspan>
+</text>
+<text x="35" y="112" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447" font-weight="bold">
+<tspan x="35" dy="0">core reader</tspan>
+</text>
+<path d="M100 130 V1015" fill="none" stroke="#b5c5cf" stroke-width="1.5" stroke-dasharray="5 5"/>
+<text x="345" y="112" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447" font-weight="bold">
+<tspan x="345" dy="0">orchestrator</tspan>
+</text>
+<path d="M410 130 V1015" fill="none" stroke="#b5c5cf" stroke-width="1.5" stroke-dasharray="5 5"/>
+<text x="695" y="112" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447" font-weight="bold">
+<tspan x="695" dy="0">TMATS (planned)</tspan>
+</text>
+<path d="M760 130 V1015" fill="none" stroke="#b5c5cf" stroke-width="1.5" stroke-dasharray="5 5"/>
+<text x="985" y="112" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447" font-weight="bold">
+<tspan x="985" dy="0">time</tspan>
+</text>
+<path d="M1050 130 V1015" fill="none" stroke="#b5c5cf" stroke-width="1.5" stroke-dasharray="5 5"/>
+<path d="M100 165 H410" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="110" y="153" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="110" dy="0">setup ch7 seq10</tspan>
+</text>
+<path d="M410 198 H760" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="420" y="186" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="420" dy="0">header + CSDW/body → open ch7</tspan>
+</text>
+<path d="M100 250 H410" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="110" y="238" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="110" dy="0">setup ch9 seq20</tspan>
+</text>
+<path d="M410 283 H760" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="420" y="271" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="420" dy="0">header + CSDW/body → open ch9</tspan>
+</text>
+<path d="M100 335 H410" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="110" y="323" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="110" dy="0">setup ch7 seq11</tspan>
+</text>
+<path d="M410 368 H760" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="420" y="356" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="420" dy="0">join ch7 only; never mix with ch9</tspan>
+</text>
+<path d="M100 420 H410" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="110" y="408" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="110" dy="0">FIRST TIME ch3 (trusted 0x11)</tspan>
+</text>
+<path d="M410 453 H760" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="420" y="441" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="420" dy="0">trusted FIRST candidate seals ch7 + ch9</tspan>
+</text>
+<path d="M760 502 H410" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="420" y="490" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="420" dy="0">INT-034 outcomes; eligible views only</tspan>
+</text>
+<path d="M410 551 H1050" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="420" y="539" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="420" dy="0">SAME time marker + eligible declarations → time interpretation (planned seam)</tspan>
+</text>
+<text x="130" y="596" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="130" dy="0">Initial candidates remain independent; closure does not choose a governing channel.</tspan>
+</text>
+<rect x="35" y="615" width="1090" height="40" fill="#eff4f7"/>
+<text x="50" y="641" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447" font-weight="bold">
+<tspan x="50" dy="0">Later recording: data, then a changed setup record (SRCC=1)</tspan>
+</text>
+<path d="M100 701 H410" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="110" y="689" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="110" dy="0">FIRST setup fragment ch7, SRCC=1</tspan>
+</text>
+<path d="M410 734 H760" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="420" y="722" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="420" dy="0">header + CSDW/body → new candidate</tspan>
+</text>
+<path d="M100 795 H410" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="110" y="783" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="110" dy="0">next TIME, ch5</tspan>
+</text>
+<path d="M410 828 H760" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="420" y="816" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="420" dy="0">seal: FIRST-fragment SRCC=1 only</tspan>
+</text>
+<path d="M760 877 H410" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="420" y="865" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="420" dy="0">INT-034; owner-policy basis; revisable</tspan>
+</text>
+<path d="M410 926 H1050" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="420" y="914" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="420" dy="0">SAME time marker + eligible updated declarations → time (planned)</tspan>
+</text>
+<rect x="35" y="972" width="1090" height="240" fill="#fff"/>
+<text x="45" y="995" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="45" dy="0">TIME: 0x11, or 0x12 from 106-17; ANY channel. First observed time untrusted → adoption withheld;</tspan>
+<tspan x="45" dy="21">a later trusted packet never replaces the initial candidate. Channels 7/9 illustrate pre-106-17 setup.</tspan>
+<tspan x="45" dy="21">FIRST-fragment SRCC=0: retransmission stays open/provisional, outside the mid-session extension.</tspan>
+<tspan x="45" dy="28">After seal: same-channel +1 continuation, same FRMT/RCCVER → otherwise Complete becomes Ambiguous.</tspan>
+<tspan x="45" dy="21">Finding: “possible premature time-boundary seal”; retain both readings, never rejoin.</tspan>
+<tspan x="45" dy="21">Verified G\SHA matching sealed text alone can keep Complete; continuity and finding remain visible.</tspan>
+<tspan x="45" dy="21">Mid-session Complete basis: “time-boundary seal (owner policy)”. Outcomes can be revised before publication.</tspan>
+<tspan x="45" dy="21">INT-034 still applies; a cut attribute remains Incomplete. Spool-before-publish must reflect revisions.</tspan>
+</text>
+</svg>

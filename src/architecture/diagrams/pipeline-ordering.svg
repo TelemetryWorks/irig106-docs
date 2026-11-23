@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="1190" viewBox="0 0 1160 1190" role="img" aria-labelledby="title desc">
+<title id="title">4 · Ordering, first-time trust and revisable seals</title><desc id="desc">Planned state machine: caller asserts start; the first observed time candidate is checked. An untrusted first time candidate withholds adoption and cannot be replaced by a later trusted marker. Mid-session time closure requires first-fragment SRCC=1; SRCC=0 remains open/provisional. Outcomes are revisable.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#365670"/></marker></defs>
+<rect width="1160" height="1190" fill="#fff"/>
+<text x="35" y="38" font-family="DejaVu Sans, sans-serif" font-size="24" fill="#132e42" font-weight="bold">
+<tspan x="35" dy="0">4 · Ordering, first-time trust and revisable seals</tspan>
+</text>
+<text x="35" y="68" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
+<tspan x="35" dy="0">Owner direction 2026-11-23 · state machine and integration planned</tspan>
+</text>
+<rect x="35" y="130" width="320" height="130" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="51" y="157" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="51" dy="0">START EVIDENCE · planned</tspan>
+<tspan x="51" dy="21.75">Caller asserts known session start.</tspan>
+<tspan x="51" dy="21.75">Unknown / cropped start remains</tspan>
+<tspan x="51" dy="21.75">unknown: automatic adoption withheld.</tspan>
+</text>
+<rect x="465" y="130" width="560" height="105" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="481" y="157" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="481" dy="0">INITIAL SETUP PHASE · planned</tspan>
+<tspan x="481" dy="21.75">Only static Format 1 setup precedes first time.</tspan>
+<tspan x="481" dy="21.75">Join per channel; preserve order and trust evidence.</tspan>
+</text>
+<path d="M355 180 H465" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<path d="M1025 160 H1100 V315 H850 V235" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="875" y="265" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="875" dy="0">static Format 1 setup</tspan>
+<tspan x="875" dy="20.3">→ join that channel</tspan>
+</text>
+<rect x="35" y="390" width="320" height="150" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="51" y="417" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="51" dy="0">ADOPTION WITHHELD · planned</tspan>
+<tspan x="51" dy="20.3">Ordering violation, or FIRST</tspan>
+<tspan x="51" dy="20.3">observed time candidate untrusted.</tspan>
+<tspan x="51" dy="20.3">Keep bytes and located findings.</tspan>
+<tspan x="51" dy="20.3">A later trusted time never</tspan>
+<tspan x="51" dy="20.3">replaces that initial candidate.</tspan>
+</text>
+<path d="M465 210 H400 V430 H355" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="40" y="350" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="40" dy="0">anything except allowed setup / eligible TIME</tspan>
+</text>
+<rect x="465" y="390" width="560" height="110" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="481" y="417" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="481" dy="0">FIRST OBSERVED TIME CANDIDATE · planned</tspan>
+<tspan x="481" dy="20.3">Trusted + eligible + clean asserted prefix → initial seal.</tspan>
+<tspan x="481" dy="20.3">Untrusted → withhold adoption; do not try the next time.</tspan>
+<tspan x="481" dy="20.3">INT-034 independently assesses sealed outcomes.</tspan>
+</text>
+<path d="M745 235 V390" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="760" y="350" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="760" dy="0">first observed TIME candidate</tspan>
+</text>
+<path d="M465 465 H355" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="365" y="452" font-family="DejaVu Sans, sans-serif" font-size="12" fill="#183447">
+<tspan x="365" dy="0">untrusted</tspan>
+</text>
+<rect x="465" y="610" width="560" height="95" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="481" y="637" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="481" dy="0">DATA PHASE · planned</tspan>
+<tspan x="481" dy="21.75">Use qualified declarations + time answers.</tspan>
+<tspan x="481" dy="21.75">Missing / withheld context stays explicit.</tspan>
+</text>
+<path d="M745 500 V610" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="780" y="540" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="780" dy="0">trusted only; sealed outcome</tspan>
+<tspan x="780" dy="20.3">is revisable, not irrevocable</tspan>
+</text>
+<rect x="465" y="835" width="560" height="105" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="481" y="862" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="481" dy="0">LATER SETUP · FIRST-fragment SRCC=1 · planned</tspan>
+<tspan x="481" dy="20.3">Next trusted eligible time on ANY channel seals it.</tspan>
+<tspan x="481" dy="20.3">Later SRCC bits do not change first-fragment eligibility.</tspan>
+</text>
+<path d="M745 705 V835" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="770" y="760" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="770" dy="0">FIRST-fragment SRCC=1</tspan>
+</text>
+<text x="35" y="740" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="35" dy="0">FIRST-fragment SRCC=0:</tspan>
+<tspan x="35" dy="20.3">retransmission stays open/provisional;</tspan>
+<tspan x="35" dy="20.3">no mid-session time-boundary extension.</tspan>
+</text>
+<text x="35" y="850" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="35" dy="0">Next trusted eligible TIME:</tspan>
+<tspan x="35" dy="20.3">seal SRCC=1 candidate → INT-034;</tspan>
+<tspan x="35" dy="20.3">basis: time-boundary seal</tspan>
+<tspan x="35" dy="20.3">(owner policy); dispatch SAME time.</tspan>
+</text>
+<path d="M465 895 H390 V660 H465" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="35" y="1000" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="35" dy="0">After a seal, same-channel +1 continuation with same FRMT/RCCVER → otherwise Complete becomes Ambiguous.</tspan>
+<tspan x="35" dy="20.3">Finding: “possible premature time-boundary seal”. Verified G\SHA over sealed text alone can keep Complete;</tspan>
+<tspan x="35" dy="20.3">retain both readings and finding; never rejoin. Outcomes are revisable for spool-before-publish.</tspan>
+<tspan x="35" dy="20.3">TIME: 0x11, or 0x12 from 106-17. INT-034 still applies; time closure is not a completeness or adoption guarantee.</tspan>
+<tspan x="35" dy="20.3">No eligible boundary yet: open/provisional. Actual EOF is separate; do not invent a time marker.</tspan>
+</text>
+</svg>

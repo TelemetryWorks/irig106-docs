@@ -6,6 +6,7 @@
 - [Verified implementation snapshot](implementation.md)
 - [Architecture](architecture/overview.md)
   - [Repository and crate boundaries](architecture/crates.md)
+  - [How the libraries pass information](architecture/pipeline.md)
   - [Packet scanning](architecture/scanner.md)
   - [Payload decoding](architecture/decoders.md)
 - [Offline inspection](usage/offline.md)

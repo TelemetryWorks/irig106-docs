@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="830" viewBox="0 0 1160 830" role="img" aria-labelledby="title desc">
+<title id="title">5 · Concurrency, streaming and buffer ownership</title><desc id="desc">Under design, core 0.2 slice 1; requirement change pending owner approval. One ordered reader grows buffers only for arriving bytes under an aggregate capacity budget, an orchestrator dispatches by type with setup and time on the ordered path, data buffers move through bounded per-channel queues to decode workers and return to the pool. Full queues or exhausted aggregate budget apply backpressure; buffers shrink after rare large packets. Never reserve declared Packet Length.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#365670"/></marker></defs>
+<rect width="1160" height="830" fill="#fff"/>
+<text x="35" y="38" font-family="DejaVu Sans, sans-serif" font-size="24" fill="#132e42" font-weight="bold">
+<tspan x="35" dy="0">5 · Concurrency, streaming and buffer ownership</tspan>
+</text>
+<text x="35" y="68" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
+<tspan x="35" dy="0">Under design · core 0.2 slice 1 · requirement change pending owner approval</tspan>
+</text>
+<rect x="40" y="110" width="300" height="110" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="56" y="137" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="56" dy="0">BUDGETED BUFFER POOL · planned</tspan>
+<tspan x="56" dy="20.3">Shared aggregate capacity budget</tspan>
+<tspan x="56" dy="20.3">Shrink after rare large packets</tspan>
+<tspan x="56" dy="20.3">No budget available → reader waits</tspan>
+</text>
+<rect x="430" y="110" width="400" height="110" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="446" y="137" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="446" dy="0">ONE ORDERED READER · core 0.2 planned</tspan>
+<tspan x="446" dy="20.3">File / network / pipe → header → body</tspan>
+<tspan x="446" dy="20.3">Grow only as bytes arrive; never reserve</tspan>
+<tspan x="446" dy="20.3">declared Packet Length; chunks OPTIONAL</tspan>
+</text>
+<path d="M340 165 H430" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="350" y="150" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="350" dy="0">acquire</tspan>
+</text>
+<path d="M630 220 V310" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="650" y="275" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="650" dy="0">file / stream order</tspan>
+</text>
+<rect x="430" y="310" width="400" height="130" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="446" y="337" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="446" dy="0">ORCHESTRATOR · planned</tspan>
+<tspan x="446" dy="20.3">Owns dispatch, pool and bounded queues</tspan>
+<tspan x="446" dy="20.3">Dispatch by data type; never broadcast</tspan>
+<tspan x="446" dy="20.3">Setup + time remain on ordered path</tspan>
+<tspan x="446" dy="20.3">Accounts for ALL buffer owners once</tspan>
+</text>
+<rect x="40" y="310" width="300" height="130" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="56" y="337" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="56" dy="0">TMATS / TIME · leaf seams planned</tspan>
+<tspan x="56" dy="20.3">Setup assembly + time interpretation</tspan>
+<tspan x="56" dy="20.3">Plain PacketFacts in types (planned)</tspan>
+<tspan x="56" dy="20.3">Header-only time marker to TMATS</tspan>
+<tspan x="56" dy="20.3">initial / FIRST SRCC=1 only</tspan>
+</text>
+<path d="M430 370 H340" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<rect x="910" y="310" width="210" height="130" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="926" y="337" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="926" dy="0">BOUNDED QUEUES</tspan>
+<tspan x="926" dy="20.3">planned; per-channel FIFO</tspan>
+<tspan x="926" dy="20.3">Preserve channel order</tspan>
+<tspan x="926" dy="20.3">Full → backpressure</tspan>
+<tspan x="926" dy="20.3">Reader waits</tspan>
+</text>
+<path d="M830 370 H910" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="841" y="355" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="841" dy="0">MOVE</tspan>
+</text>
+<rect x="890" y="535" width="230" height="110" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="906" y="562" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="906" dy="0">DECODE WORKERS · planned</tspan>
+<tspan x="906" dy="20.3">Own the moved buffer</tspan>
+<tspan x="906" dy="20.3">Borrow payload as &amp;[u8]</tspan>
+<tspan x="906" dy="20.3">Return buffer after use</tspan>
+</text>
+<path d="M1015 440 V535" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="1030" y="490" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="1030" dy="0">MOVE</tspan>
+</text>
+<path d="M1015 645 V700 H20 V165 H40" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="450" y="685" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="450" dy="0">RETURN ownership to the pool; no payload copy</tspan>
+</text>
+<text x="40" y="755" font-family="DejaVu Sans, sans-serif" font-size="14" fill="#183447">
+<tspan x="40" dy="0">Sum ALL buffer capacities ≤ aggregate budget; ownership moves without double-counting.</tspan>
+<tspan x="40" dy="20.3">Soft per-type limits; hard ceiling only with corroboration. Above ceiling: typed error or reported drain.</tspan>
+</text>
+</svg>

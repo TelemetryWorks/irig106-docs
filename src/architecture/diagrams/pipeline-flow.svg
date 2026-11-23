@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="940" viewBox="0 0 1160 940" role="img" aria-labelledby="title desc">
+<title id="title">2 · One streaming pass, driven by an orchestrator</title><desc id="desc">The planned orchestrator receives every packet in file order, calls TMATS with header facts and setup bodies, and routes qualified declarations, time packets and data without libraries calling each other.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#365670"/></marker></defs>
+<rect width="1160" height="940" fill="#fff"/>
+<text x="35" y="38" font-family="DejaVu Sans, sans-serif" font-size="24" fill="#132e42" font-weight="bold">
+<tspan x="35" dy="0">2 · One streaming pass, driven by an orchestrator</tspan>
+</text>
+<text x="35" y="68" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
+<tspan x="35" dy="0">Coordinator-recommended design · integration planned · no library-to-library runtime calls</tspan>
+</text>
+<rect x="45" y="100" width="1070" height="85" rx="10" fill="#eaf4f8" stroke="#3d718c" stroke-width="1.7"/>
+<text x="61" y="127" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#183447">
+<tspan x="61" dy="0">irig106-core · ONE PacketReader · shared packet-facts output planned</tspan>
+<tspan x="61" dy="23.2">FILE ORDER; offset + channel + data type + sequence + flags + RTC</tspan>
+<tspan x="61" dy="23.2">Bounded DATA capture; structure/integrity evidence, not payload meaning</tspan>
+</text>
+<path d="M255 185 V240" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="45" y="240" width="440" height="510" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="61" y="267" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="61" dy="0">ORCHESTRATOR · planned</tspan>
+<tspan x="61" dy="21.75">CLI app, or future pipeline crate (planned)</tspan>
+<tspan x="61" dy="21.75">Initial phase: TMATS sees every header.</tspan>
+<tspan x="61" dy="21.75">For EVERY packet: one type-byte dispatch.</tspan>
+<tspan x="61" dy="21.75">Setup: TMATS gets facts + CSDW/body.</tspan>
+<tspan x="61" dy="21.75">Time marker: initial / FIRST SRCC=1 only.</tspan>
+<tspan x="61" dy="21.75"></tspan>
+<tspan x="61" dy="21.75">On seal: assess revisable outcome, then parse</tspan>
+<tspan x="61" dy="21.75">eligible records into qualified declarations.</tspan>
+<tspan x="61" dy="21.75">Do not treat a boundary as completeness.</tspan>
+<tspan x="61" dy="21.75"></tspan>
+<tspan x="61" dy="21.75">Dispatch the SAME time marker afterwards.</tspan>
+<tspan x="61" dy="21.75">Data packets go ONLY to decode.</tspan>
+<tspan x="61" dy="21.75"></tspan>
+<tspan x="61" dy="21.75">Caller owns capture and finite memory limits.</tspan>
+<tspan x="61" dy="21.75">No hidden second scan; no unbounded backlog.</tspan>
+</text>
+<rect x="675" y="245" width="440" height="135" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="691" y="272" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="691" dy="0">irig106-tmats · planned rebuild/seam</tspan>
+<tspan x="691" dy="21.75">SetupAssembler.observe(...) · conceptual</tspan>
+<tspan x="691" dy="21.75">Per-channel joins; ordering + closure</tspan>
+<tspan x="691" dy="21.75">Sealed record → INT-034 → eligible parse</tspan>
+<tspan x="691" dy="21.75">TimeView / channel declarations: plain data</tspan>
+</text>
+<path d="M485 280 H675" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="500" y="267" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="500" dy="0">setup / initial facts</tspan>
+</text>
+<path d="M675 360 H485" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="500" y="347" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="500" dy="0">views + findings</tspan>
+</text>
+<rect x="675" y="465" width="440" height="105" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="691" y="492" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="691" dy="0">irig106-time · leaf</tspan>
+<tspan x="691" dy="21.75">Time packets + qualified declarations in</tspan>
+<tspan x="691" dy="21.75">Time answers + basis/findings out</tspan>
+<tspan x="691" dy="21.75">TimeView integration planned</tspan>
+</text>
+<path d="M485 490 H675" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="500" y="477" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="500" dy="0">time + declarations</tspan>
+</text>
+<path d="M675 550 H485" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="500" y="537" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="500" dy="0">time answers</tspan>
+</text>
+<rect x="675" y="655" width="440" height="80" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="691" y="682" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="691" dy="0">irig106-decode · planned</tspan>
+<tspan x="691" dy="21.75">Data + declarations + time answers</tspan>
+<tspan x="691" dy="21.75">→ payload results with provenance</tspan>
+</text>
+<path d="M485 680 H675" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="500" y="667" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="500" dy="0">qualified inputs</tspan>
+</text>
+<path d="M675 722 H485" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+<text x="500" y="709" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#183447">
+<tspan x="500" dy="0">decoded results</tspan>
+</text>
+<rect x="45" y="815" width="1070" height="82" rx="10" fill="#fff6df" stroke="#a7741d" stroke-width="1.7" stroke-dasharray="7 4"/>
+<text x="61" y="842" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#183447">
+<tspan x="61" dy="0">Downstream integration planned: write / index / validator → CLI / Studio</tspan>
+<tspan x="61" dy="21.75">Arrows above carry information through the orchestrator, not Cargo dependencies.</tspan>
+<tspan x="61" dy="21.75">No implicit data-channel ↔ time-channel association is established by a TimeView.</tspan>
+</text>
+<path d="M265 750 V815" fill="none" stroke="#365670" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6 4"/>
+</svg>
