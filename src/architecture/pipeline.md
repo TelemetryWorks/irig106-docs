@@ -97,8 +97,12 @@ carry-forward or provisional-use policy is invented here.
 
 - **Join per channel (INT-011).** Other-channel setup fragments never mix with
   or interrupt a run. Preserve sequence progression, FRMT/RCCVER agreement,
-  fragment provenance, and start/stop evidence. The channel-0 restriction from
-  106-17 is an independent conformance check, not permission to merge runs.
+  fragment provenance, and start/stop evidence. Channel 0 is edition-dependent:
+  **106-13 and 106-15** reserve it for Computer-Generated **Format 1**, with
+  wording “as of 106-13”; **106-17 and later** allow Computer-Generated
+  **Format 1 or 4**. Apply the applicable edition's conformance rule separately;
+  it is never permission to merge per-channel runs. Diagram 3's nonzero setup
+  channels illustrate **106-11**, not every edition before 106-17.
 - **Initial closure (INT-045).** The **first observed TIME candidate** on any
   channel supplies the initial boundary only if it is structurally trusted and
   eligible. If that first candidate is untrusted, adoption is withheld; a later
@@ -229,8 +233,12 @@ policy, not a claim that core 0.1 enforces these packet-size limits. See the
 **Hard ceiling for standard-violating packets.** A caller may configure a hard
 ceiling beyond the applicable soft limit, but acceptance requires corroboration:
 
-- **Seekable input:** validate a next header at `packet_offset + Packet Length`
-  with checked offset arithmetic; the declared length alone is not evidence.
+- **Seekable input:** corroborate `packet_offset + Packet Length` using checked
+  arithmetic: a valid next header at that offset, **or an end offset exactly
+  equal to known EOF**, qualifies. A packet ending exactly at EOF has no next
+  header to validate. An end offset beyond EOF does not qualify; neither does
+  EOF encountered before the declared end. The declared length alone is not
+  evidence.
 - **Stream input:** require explicit caller opt-in for standard-violating packet
   acceptance. Do not infer permission from the length or from arriving bytes.
 
@@ -242,8 +250,11 @@ packet. Detailed defaults, errors and evidence are still slice-1 design work.
 
 **Aggregate budget, not per-buffer multiplication.** Account for allocated
 capacity across **all** reader, pool, queued and worker-owned buffers, counting
-each owned buffer once. Pause reading/growth when the budget cannot admit more
-bytes; ownership returns and shrink release capacity. Bounded queues provide
+each owned buffer once. Pause reading/growth when capacity can become available
+through other buffers returning or shrinking. **An impossible fit must not wait:**
+if the packet cannot fit even with every other buffer returned and all budget
+available to it, give a **typed error or a reported drain**. Do not deadlock by
+waiting for backpressure to resolve a packet larger than the whole budget. Bounded queues provide
 backpressure rather than creating more memory. Shrink policy and separately
 bounded semantic/queue metadata must be specified and tested. **Chunked delivery
 is optional** for incremental decoders, not the default skip/chunk model.
@@ -279,7 +290,9 @@ arriving, never by reservation of declared Packet Length. Automatically allow
 the applicable standard soft limit (524,288 bytes; Format 1 setup 134,217,728,
 Chapter 11 §11.2.1(c), Table 11-3), subject to the aggregate budget. Beyond that,
 require a caller-set hard ceiling **and** corroboration: a valid next header at
-`offset + Packet Length` on seekable input, or explicit opt-in on streams.
+`offset + Packet Length` **or an end offset exactly at known EOF** on seekable
+input, or explicit opt-in on streams. A short/truncated packet ending before its
+declared end is not corroborated by EOF.
 Above the permitted ceiling, issue a typed error or reported drain. Shrink back
 after rare large packets. Optional fixed-size chunks support incremental
 decoders; skip/chunk is not the proposed default.
@@ -309,8 +322,10 @@ and no unlimited buffer creation when workers fall behind.
 **Budget all buffer owners together.** Sum allocated capacities across the
 reader, available pool, queues and workers, counting each moved buffer once.
 Growth must fit the **aggregate memory budget**, not a “pool size × fixed cap”
-formula. If memory or queue capacity is unavailable, apply backpressure; return
-and shrink buffers to free budget after rare large packets. Separately bound
+formula. If memory or queue capacity is temporarily unavailable, apply backpressure;
+return and shrink buffers to free budget after rare large packets. If a packet
+could not fit even with all other buffers returned, use a typed error or reported
+drain instead of waiting forever. Separately bound
 assembler, queue metadata and worker state; the buffer budget is not total RSS.
 
 **Live streaming.** Use the same ownership and dispatch shape for network or
