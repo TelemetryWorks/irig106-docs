@@ -199,59 +199,90 @@ consumer without TMATS depending on core.
 
 Payload slices are **borrowed `&[u8]` from one reader buffer**, with no payload
 copy between libraries on the synchronous data path (**planned**). A borrow may
-not survive reuse of its backing buffer. In the planned API, large bodies use
-fixed-size chunks or an explicitly larger capture cap;
-this is not a promise of a whole-packet slice for every declared length. This does not promise no
+not survive reuse or resizing of its backing buffer. The proposed default
+retains arrived bytes within the limits and aggregate budget below; optional
+chunk mode serves incremental decoders. No borrow may outlive its owner. This does not promise no
 kernel-to-user copy, allocation-free setup assembly, or copy-free owned exports.
 
-### Reuse packet storage: planned core 0.2 API
+### Reuse packet storage: core 0.2 slice 1 under design
 
-The caller chooses **fixed buffer and capture sizes**. Reuse storage up to those
-caps to avoid per-packet allocation; **never grow storage to Packet Length**.
-Header length is framing evidence used to determine how much to consume, not an
-allocation request. For a body larger than the capture cap, drain/skip the
-uncaptured bytes, or deliver fixed-size chunks to a streaming consumer
-(**planned** chunk/reuse API). Formats needing a whole large packet must explicitly
-opt into a larger caller-selected cap or support chunked decoding.
+**Under design, core 0.2 slice 1; requirement change pending owner approval.**
+Owner direction, 2026-11-23, replaces fixed-buffer skip/chunk as the proposed
+**default**. It does not change released core 0.1 or approve a requirements change.
 
-Over-cap handling is **never silent truncation**: expose capture-incomplete
-evidence or a typed limit, as appropriate to the requested operation. Today core
-clamps requested capture to DATA length, checks the explicit capture limit and
-drains uncaptured DATA/trailer; an oversized packet need not be rejected merely
-because only a prefix was requested. A prefix is never passed off as a full body.
+**Grow only with arriving bytes.** A reusable buffer grows **only as bytes
+actually arrive**, never by reserving the header's declared Packet Length. A
+bogus huge length therefore cannot trigger a huge reservation; only bytes that
+really exist can drive growth, within the aggregate budget. Storage is reused
+between ordinary packets and shrinks back after a rare large packet. Growth and
+shrink may allocate; no zero-allocation claim is made for those transitions.
 
-Any core 0.2 API must preserve **L1-CORE-002** (memory independent of recording
-and declared packet size) and **L2-IO-002** (no Packet-Length allocations).
-Changing either needs an **owner-approved requirement change plus an RSS control**;
-this documentation does not authorize one. Core slice 8's **64 MiB packet with
-four-byte capture** is the existing counterexample to packet-sized buffering,
-not evidence for it. Memory is determined by explicit caps, independent of
-packet size. See the pinned [core requirements](https://github.com/TelemetryWorks/irig106-core/blob/3c12bcd33b1ae66cca2d6378f4bfe08f2fc8c9a1/docs/requirements.md)
+**Soft per-type standard limits.** The proposed automatic allowance follows
+IRIG 106-24R1 Chapter 11 **§11.2.1(c), Table 11-3**: **524,288 bytes**, with
+**134,217,728 bytes for Computer-Generated Format 1 setup packets**. These are
+Packet Length limits, not a reason to reserve storage in advance. Acceptance
+within the applicable soft limit needs no special caller opt-in, but still
+requires structural checks and room in the aggregate budget. This is a proposed
+policy, not a claim that core 0.1 enforces these packet-size limits. See the
+[archived Chapter 11](https://github.com/TelemetryWorks/rcc-106-standards/releases/download/106-24R1/chapter11.pdf).
+
+**Hard ceiling for standard-violating packets.** A caller may configure a hard
+ceiling beyond the applicable soft limit, but acceptance requires corroboration:
+
+- **Seekable input:** validate a next header at `packet_offset + Packet Length`
+  with checked offset arithmetic; the declared length alone is not evidence.
+- **Stream input:** require explicit caller opt-in for standard-violating packet
+  acceptance. Do not infer permission from the length or from arriving bytes.
+
+Corroboration permits acceptance up to the caller ceiling; it never permits a
+Packet-Length reservation or bypasses the aggregate budget. Above the permitted
+ceiling, produce a **typed error or an explicitly reported drain**, never silent
+truncation. Failure to corroborate is not permission to accept the oversized
+packet. Detailed defaults, errors and evidence are still slice-1 design work.
+
+**Aggregate budget, not per-buffer multiplication.** Account for allocated
+capacity across **all** reader, pool, queued and worker-owned buffers, counting
+each owned buffer once. Pause reading/growth when the budget cannot admit more
+bytes; ownership returns and shrink release capacity. Bounded queues provide
+backpressure rather than creating more memory. Shrink policy and separately
+bounded semantic/queue metadata must be specified and tested. **Chunked delivery
+is optional** for incremental decoders, not the default skip/chunk model.
+
+**Core 0.1 applies today.** **L1-CORE-002** still requires memory independent of
+recording and declared packet size; **L2-IO-002** forbids Packet-Length
+allocations. The existing slice-8 **64 MiB packet / four-byte capture** RSS
+control remains evidence for that released contract. The proposed arrival-driven
+buffer policy requires an **owner-approved requirement change plus an RSS
+control** before implementation/adoption; approval is pending. A design direction
+here is not that approval. See the pinned [core requirements](https://github.com/TelemetryWorks/irig106-core/blob/3c12bcd33b1ae66cca2d6378f4bfe08f2fc8c9a1/docs/requirements.md)
 and [slice 8 evidence](https://github.com/TelemetryWorks/irig106-core/blob/3c12bcd33b1ae66cca2d6378f4bfe08f2fc8c9a1/docs/verification-s08.md).
 
-**Current core 0.1 differs:** its
-[reader implementation](https://github.com/TelemetryWorks/irig106-core/blob/3c12bcd33b1ae66cca2d6378f4bfe08f2fc8c9a1/crates/irig106-core/src/reader.rs)
-creates an owned `Vec` capture per packet and reserves the requested DATA prefix
-(nonzero capture can allocate). Its bounded `body_prefix` is not the planned
-reusable borrowed-payload API. No core code or public API changes are made here.
+The current [core 0.1 reader](https://github.com/TelemetryWorks/irig106-core/blob/3c12bcd33b1ae66cca2d6378f4bfe08f2fc8c9a1/crates/irig106-core/src/reader.rs)
+creates an owned `Vec` capture per packet, reserves the requested DATA prefix
+(nonzero capture can allocate), checks the capture limit and drains uncaptured
+bytes. Its partial-capture evidence must not be passed off as a full body. This
+existing behavior is distinct from the proposed default; no core code or API
+changes are made by this docs PR.
 
 ### Concurrency, streaming and buffers
 
-**Planned / design direction — owner request, 2026-11-23.** The following extends
-the core 0.2 target, not the current core 0.1 owned-capture API.
+**Under design, core 0.2 slice 1; requirement change pending owner approval.**
+Owner direction, 2026-11-23. Core 0.1 retains its current bounded-capture rules;
+this subsection describes the proposed future default, not released behavior.
 
-![Planned fixed buffer pool, ordered reader, selective dispatch, bounded per-channel queues and ownership-return workers](diagrams/pipeline-buffers.png)
+![Planned aggregate-budget buffer pool, arrival-driven reader, bounded per-channel queues and ownership-return workers](diagrams/pipeline-buffers.png)
 
 [SVG source](diagrams/pipeline-buffers.svg) · [PNG export](diagrams/pipeline-buffers.png)
 
-**Buffer sizing.** Packet Length is known before reading the body, but must not
-size the allocation. The caller selects fixed buffer/capture caps; reusable
-storage stays within them. Excess body bytes are drained/skipped, or streamed in
-fixed-size chunks (**planned**). Whole-packet formats require an explicit larger
-cap or chunk-capable decoding. Capture-incomplete evidence or a typed limit
-reports over-cap handling; no silent truncation. Memory does **not** follow the
-largest declared packet. The standard's packet-size cap still needs an exact
-edition/section citation in the core proposal; no numeric cap is asserted here.
+**Buffer sizing and limits.** Grow reusable buffers only for bytes actually
+arriving, never by reservation of declared Packet Length. Automatically allow
+the applicable standard soft limit (524,288 bytes; Format 1 setup 134,217,728,
+Chapter 11 §11.2.1(c), Table 11-3), subject to the aggregate budget. Beyond that,
+require a caller-set hard ceiling **and** corroboration: a valid next header at
+`offset + Packet Length` on seekable input, or explicit opt-in on streams.
+Above the permitted ceiling, issue a typed error or reported drain. Shrink back
+after rare large packets. Optional fixed-size chunks support incremental
+decoders; skip/chunk is not the proposed default.
 
 **Is concurrency useful?** These are workload expectations to benchmark, not
 measured results or universal classifications:
@@ -268,18 +299,19 @@ only data decoding fans out. Assign work per **channel** through bounded FIFO
 queues, preserving each channel's order even if other channels finish earlier.
 Do not let worker completion order redefine setup or time context.
 
-**Move buffers; borrow inside the owner.** Use a fixed-count pool of reusable
-buffers. The reader takes a buffer, fills it, and **moves ownership** through the
+**Move buffers; borrow inside the owner.** Use a bounded pool of reusable
+buffers under one aggregate memory budget. The reader takes a buffer, fills it, and **moves ownership** through the
 queue to a worker. That worker borrows `&[u8]` payload slices from the buffer it
 owns and returns ownership to the pool after use. A slice alone cannot outlive
 its backing buffer. There is no inter-library payload copy in this planned path,
 and no unlimited buffer creation when workers fall behind.
 
-Pool payload storage is bounded by **pool size × fixed buffer cap**, independent
-of declared packet size. Allocate/reuse at the configured cap, not by growth to a
-packet high-water mark. Add fixed metadata and separately bounded queue,
-assembler and worker state; this is not a whole-process RSS formula. Oversized
-bodies require explicit partial-capture evidence, chunk handling, or typed limits.
+**Budget all buffer owners together.** Sum allocated capacities across the
+reader, available pool, queues and workers, counting each moved buffer once.
+Growth must fit the **aggregate memory budget**, not a “pool size × fixed cap”
+formula. If memory or queue capacity is unavailable, apply backpressure; return
+and shrink buffers to free budget after rare large packets. Separately bound
+assembler, queue metadata and worker state; the buffer budget is not total RSS.
 
 **Live streaming.** Use the same ownership and dispatch shape for network or
 pipe input after the applicable transport framing adapter. Bounded queues give
@@ -293,8 +325,8 @@ open/provisional; do not synthesize EOF or silently relax completeness checks.
 
 | Location | Planned responsibility |
 | --- | --- |
-| `irig106-core` 0.2 | The one reader, reusable owned buffers suitable for `Send` transfer, fixed buffer/capture caps, drain or planned fixed-size chunk delivery, explicit incomplete/limit evidence |
-| Orchestrator | Type dispatch, fixed pool, bounded queues, per-channel scheduling and ordered setup/time context |
+| `irig106-core` 0.2 | The one reader, reusable owned buffers suitable for `Send` transfer, arrival-driven reusable buffers, soft/hard limit evidence, corroboration, shrink and optional chunks; requirement change pending |
+| Orchestrator | Type dispatch, aggregate buffer-budget accounting, pool, bounded queues, per-channel scheduling and ordered setup/time context |
 | `irig106-types` | Small header-only `PacketFacts` shared by producer and consumers |
 | TMATS / time / decode leaves | Selected semantic work; no second reader, hidden queue or recording walk. Time depends only on types; TMATS stays independent of core |
 
@@ -307,7 +339,8 @@ an enforced rate cap; data-time answer queries can be much more frequent.
 
 Add reproducible **throughput** and **allocations-per-packet** benchmarks and a
 CI regression gate, following the existing RSS-regression approach. Cover steady
-state separately from configured buffer/pool initialization allocations, varying packet sizes,
+state separately from initialization, arrival-driven growth and shrink allocations;
+vary packet sizes,
 setup/time transitions, channel count and pool backpressure. Report hardware,
 fixtures, capture/validation settings, capacity limits and allocation accounting.
 The current core RSS test does not prove any of these new targets. No throughput
