@@ -97,8 +97,12 @@ carry-forward or provisional-use policy is invented here.
 
 - **Join per channel (INT-011).** Other-channel setup fragments never mix with
   or interrupt a run. Preserve sequence progression, FRMT/RCCVER agreement,
-  fragment provenance, and start/stop evidence. The channel-0 restriction from
-  106-17 is an independent conformance check, not permission to merge runs.
+  fragment provenance, and start/stop evidence. Channel-0 conformance is
+  edition-dependent (see the table below), not a joining predicate. **INT-011
+  still joins nonconformant setup channels** independently; retain the bytes
+  and report the edition-specific conformance finding rather than dropping
+  fragments or merging channels. Diagram 3's label is: **“Channels 7/9 illustrate
+  pre-106-11 distributed-multiplexer or nonconformant input.”**
 - **Initial closure (INT-045).** The **first observed TIME candidate** on any
   channel supplies the initial boundary only if it is structurally trusted and
   eligible. If that first candidate is untrusted, adoption is withheld; a later
@@ -115,6 +119,16 @@ carry-forward or provisional-use policy is invented here.
   UTC answer, or time-source selection is needed to recognize the boundary.
   Header/edition trust still matters; corrupt or unreadable bytes are not a
   trusted marker merely because they resemble a type code.
+
+Channel-0 rules must not be backdated from later editions:
+
+| Edition | Channel-0 wording / setup-channel conformance |
+| --- | --- |
+| 106-05 | Channel 0 reserved for computer-generated messages; no setup-only-on-channel-0 rule. |
+| 106-07 / 106-09 | Single multiplexer: all Computer-Generated packets on channel 0 only, and only they use it. Distributed multiplexer (`R-x\NSB` source bits): not restricted. |
+| 106-11 | “Format 1 Setup Record shall occur in Channel ID 0 only”; other Computer-Generated formats deprecated on channel 0 |
+| 106-13 / 106-15 | Format 1 only, with “as of 106-13” wording |
+| 106-17 and later | Computer-Generated Format 1 or 4 allowed on channel 0 |
 
 A sealed run is not automatically complete or governing. INT-034 independently
 assesses complete/incomplete/ambiguous outcomes. Cut-mid-attribute text is
@@ -229,8 +243,18 @@ policy, not a claim that core 0.1 enforces these packet-size limits. See the
 **Hard ceiling for standard-violating packets.** A caller may configure a hard
 ceiling beyond the applicable soft limit, but acceptance requires corroboration:
 
-- **Seekable input:** validate a next header at `packet_offset + Packet Length`
-  with checked offset arithmetic; the declared length alone is not evidence.
+- **Seekable input:** the current [core #16 design](https://github.com/TelemetryWorks/irig106-core/blob/f4582007a28bc9c5483d7106d68ceba5e3d40a4d/docs/design-0.2.md)
+  requires a valid next header at `packet_offset + Packet Length`, with checked
+  arithmetic. It **refuses** a final over-soft packet ending exactly at EOF as
+  **`Uncorroborated`**: there is no next header.
+- **Exact-EOF exception — OWNER DECISION PENDING:** accepting an end offset
+  exactly equal to **known EOF** instead of a next header is a proposed change,
+  not the current core #16 rule. Here “known EOF” means the source size taken
+  **at the probe and rechecked before the packet is returned**, with observable
+  source changes taking core's **`SourceChanged`** path; alternatively, the
+  caller declares the input final and supplies its final byte extent. An
+  observed pause or a short read is not that declaration. A declared end beyond
+  EOF, or EOF before the declared end, never corroborates a complete packet.
 - **Stream input:** require explicit caller opt-in for standard-violating packet
   acceptance. Do not infer permission from the length or from arriving bytes.
 
@@ -242,8 +266,14 @@ packet. Detailed defaults, errors and evidence are still slice-1 design work.
 
 **Aggregate budget, not per-buffer multiplication.** Account for allocated
 capacity across **all** reader, pool, queued and worker-owned buffers, counting
-each owned buffer once. Pause reading/growth when the budget cannot admit more
-bytes; ownership returns and shrink release capacity. Bounded queues provide
+each owned buffer once. Pause reading/growth when capacity can become available
+through other buffers returning or shrinking. **An impossible fit must not wait:**
+if the **packet plus its own unavoidable allocation/growth workspace and
+metadata** cannot fit even with every other buffer returned and all budget
+available to it, give a **typed error or a reported drain**. This includes the
+packet's own overhead, matching core #16's **`BudgetTooSmall`** case; comparing
+Packet Length alone with the budget is insufficient. Do not deadlock by
+waiting for backpressure to resolve a packet larger than the whole budget. Bounded queues provide
 backpressure rather than creating more memory. Shrink policy and separately
 bounded semantic/queue metadata must be specified and tested. **Chunked delivery
 is optional** for incremental decoders, not the default skip/chunk model.
@@ -280,6 +310,10 @@ the applicable standard soft limit (524,288 bytes; Format 1 setup 134,217,728,
 Chapter 11 §11.2.1(c), Table 11-3), subject to the aggregate budget. Beyond that,
 require a caller-set hard ceiling **and** corroboration: a valid next header at
 `offset + Packet Length` on seekable input, or explicit opt-in on streams.
+**Exact-EOF corroboration is an OWNER DECISION PENDING**, not current core #16
+behavior (`Uncorroborated`). The proposed “known EOF” definition requires the
+probe's size recheck before return (`SourceChanged` on observable change), or
+caller-declared final input with its final extent. Premature EOF is not proof.
 Above the permitted ceiling, issue a typed error or reported drain. Shrink back
 after rare large packets. Optional fixed-size chunks support incremental
 decoders; skip/chunk is not the proposed default.
@@ -309,8 +343,11 @@ and no unlimited buffer creation when workers fall behind.
 **Budget all buffer owners together.** Sum allocated capacities across the
 reader, available pool, queues and workers, counting each moved buffer once.
 Growth must fit the **aggregate memory budget**, not a “pool size × fixed cap”
-formula. If memory or queue capacity is unavailable, apply backpressure; return
-and shrink buffers to free budget after rare large packets. Separately bound
+formula. If memory or queue capacity is temporarily unavailable, apply backpressure;
+return and shrink buffers to free budget after rare large packets. If a packet
+**plus its own unavoidable workspace and metadata** could not fit even with all
+other buffers returned, use a typed **`BudgetTooSmall`** error or reported drain
+instead of waiting forever. Separately bound
 assembler, queue metadata and worker state; the buffer budget is not total RSS.
 
 **Live streaming.** Use the same ownership and dispatch shape for network or
