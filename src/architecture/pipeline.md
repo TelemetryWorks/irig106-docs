@@ -191,21 +191,68 @@ creates an owned `Vec` capture per packet and reserves the requested DATA prefix
 (nonzero capture can allocate). Its bounded `body_prefix` is not the planned
 reusable borrowed-payload API. No core code or public API changes are made here.
 
-### Ordered reader, bounded worker fan-out (planned)
+### Concurrency, streaming and buffers
 
-Keep **one ordered reader**: setup closure, initial ordering and time-reference
-updates stay on the ordered path. Fan out per **channel** to workers through
-bounded channels, preserving order within each channel. Do not let worker
-completion reorder the observations used for setup and time context.
+**Planned / design direction — owner request, 2026-11-23.** The following extends
+the core 0.2 target, not the current core 0.1 owned-capture API.
 
-A **fixed-size buffer pool** supports ownership transfer: the reader fills a
-pool buffer, moves ownership to a worker, and receives the buffer back after use.
-A worker borrows payload slices from the buffer it owns; a borrowed slice alone
-cannot outlive that buffer. This extends the synchronous one-buffer design
-without copying payloads between libraries. When the pool/queues are full, use
-backpressure rather than allocating more buffers. Pool payload storage is bounded
-by **pool size × maximum packet capacity**, plus fixed metadata and separately
-bounded queue, assembler, and worker state; this is not a whole-process RSS claim.
+![Planned fixed buffer pool, ordered reader, selective dispatch, bounded per-channel queues and ownership-return workers](diagrams/pipeline-buffers.png)
+
+[SVG source](diagrams/pipeline-buffers.svg) · [PNG export](diagrams/pipeline-buffers.png)
+
+**Buffer sizing.** The header provides Packet Length before the body is read.
+After structural validation and overflow checks, grow a reusable buffer only as
+needed and retain its capacity for later packets. Memory follows the largest
+accepted packet's retained capacity, not the file size. A caller-set ceiling
+makes an over-limit packet a **typed error before growth or body reading**.
+The standard's packet-size cap still needs confirmation with an exact
+edition/section citation in the core proposal; this page adopts no numeric
+standard limit and does not substitute the caller's ceiling for that requirement.
+
+**Is concurrency useful?** These are workload expectations to benchmark, not
+measured results or universal classifications:
+
+| Workload | Expected bottleneck | Expected concurrency benefit |
+| --- | --- | --- |
+| Structural summaries | I/O-dominated for light traversal | Small; extra coordination may outweigh the gain |
+| Heavy PCM, MIL-STD-1553 or video decoding | CPU-dominated when interpretation is costly | Potentially large, subject to profiling and available channel parallelism |
+
+**One ordered reader.** File order is required for INT-045 setup closure and the
+initial ordering check. Keep setup processing, time-reference updates and time
+correlation on that ordered path. Dispatch by data type, **not broadcasting**;
+only data decoding fans out. Assign work per **channel** through bounded FIFO
+queues, preserving each channel's order even if other channels finish earlier.
+Do not let worker completion order redefine setup or time context.
+
+**Move buffers; borrow inside the owner.** Use a fixed-count pool of reusable
+buffers. The reader takes a buffer, fills it, and **moves ownership** through the
+queue to a worker. That worker borrows `&[u8]` payload slices from the buffer it
+owns and returns ownership to the pool after use. A slice alone cannot outlive
+its backing buffer. There is no inter-library payload copy in this planned path,
+and no unlimited buffer creation when workers fall behind.
+
+Pool payload storage is bounded by **pool size × largest retained packet
+capacity**, with the caller's ceiling bounding each buffer. This is an upper
+bound when buffers have different capacities; add fixed metadata and separately
+bounded queue, assembler and worker state. It is not a whole-process RSS formula.
+Growth allocations remain possible when an accepted packet exceeds the previous
+high-water mark; steady-state reuse is the no-per-packet-allocation target.
+
+**Live streaming.** Use the same ownership and dispatch shape for network or
+pipe input after the applicable transport framing adapter. Bounded queues give
+**backpressure**: the reader waits if a worker queue is full or no pool buffer is
+free. A transport that cannot be paused, such as a UDP sender, may still lose
+packets upstream; bounded memory is not a lossless-delivery guarantee. Setup
+closes at the next eligible trusted time packet, initially or mid-recording, so
+that closure **does not require EOF**. No time marker means the candidate stays
+open/provisional; do not synthesize EOF or silently relax completeness checks.
+
+| Location | Planned responsibility |
+| --- | --- |
+| `irig106-core` 0.2 | The one reader, reusable owned buffers suitable for `Send` transfer, checked sizing and typed ceiling errors |
+| Orchestrator | Type dispatch, fixed pool, bounded queues, per-channel scheduling and ordered setup/time context |
+| `irig106-types` | Small header-only `PacketFacts` shared by producer and consumers |
+| TMATS / time / decode leaves | Selected semantic work; no second reader, hidden queue or recording walk. Time depends only on types; TMATS stays independent of core |
 
 Time correlation stays on the ordered path. Time-reference updates are expected
 to be cheap and around **1 Hz per time channel**, not necessarily once per second
