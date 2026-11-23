@@ -124,8 +124,8 @@ Channel-0 rules must not be backdated from later editions:
 
 | Edition | Channel-0 wording / setup-channel conformance |
 | --- | --- |
-| 106-05 | No channel-0 rule |
-| 106-07 / 106-09 | Distributed-multiplexer systems permitted via `R-x\NSB` |
+| 106-05 | Channel 0 reserved for computer-generated messages; no setup-only-on-channel-0 rule. |
+| 106-07 / 106-09 | Single multiplexer: all Computer-Generated packets on channel 0 only, and only they use it. Distributed multiplexer (`R-x\NSB` source bits): not restricted. |
 | 106-11 | “Format 1 Setup Record shall occur in Channel ID 0 only”; other Computer-Generated formats deprecated on channel 0 |
 | 106-13 / 106-15 | Format 1 only, with “as of 106-13” wording |
 | 106-17 and later | Computer-Generated Format 1 or 4 allowed on channel 0 |
